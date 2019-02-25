@@ -1,10 +1,14 @@
-from discord.ext import commands
 from os import listdir
-from os.path import isfile, join
-import sys
-sys.path.append('..')
-from config import *
+from os.path import isfile, join, abspath
 import traceback
+
+from discord.ext import commands
+
+# Config is private
+import sys
+sys.path.append(abspath('..'))
+from config import *
+from common import *
 
 cogs_dir = "cogs"
 
@@ -17,60 +21,63 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
-@bot.command()
-@commands.has_any_role('Cool Squad','Admin','Mods')
-async def load(extension_name : str):
-    """Loads an extension."""
+def _load(ext : str):
+    """Internal: loads module.
+    :return: (success:bool, error:str)
+    """
     try:
         bot.load_extension(extension_name)
     except (AttributeError, ImportError) as e:
-        await bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
-        return
-    await bot.say("{} loaded.".format(extension_name))
+        return False, "```py\n%s: %s\n```" % (type(e).__name__, e)
+    return True, "{} loaded.".format(extension_name)
+
+def _unload(ext : str):
+    """Internal: unloads module.
+    :return: (success:bool, error:str)
+    """
+    module = bot.extensions.get(extension_name)
+    if module is None:
+        return False, "```py\nModuleNotFoundError: No module named '%s'\n```" % extension_name
+    bot.unload_extension(extension_name)
+    return True, "{} unloaded.".format(extension_name)
 
 @bot.command()
-@commands.has_any_role('Cool Squad','Admin','Mods')
+@commands.has_any_role(*admin_roles)
+async def load(extension_name : str):
+    """Loads an extension."""
+    success, log = _load(extension_name)
+    await bot.say(log)
+
+@bot.command()
+@commands.has_any_role(*admin_roles)
 async def unload(extension_name : str):
-    module = bot.extensions.get(extension_name)
-    if module is None:
-        await bot.say("```py\n"+"ModuleNotFoundError: No module named '"+extension_name+"'\n```")
-        return
     """Unloads an extension."""
-    bot.unload_extension(extension_name)
-    await bot.say("{} unloaded.".format(extension_name))
+    success, log = _unload(extension_name)
+    await bot.say(log)
     
 @bot.command()
-@commands.has_any_role('Cool Squad','Admin','Mods')
+@commands.has_any_role(*admin_roles)
 async def reload(extension_name : str):
-    module = bot.extensions.get(extension_name)
-    if module is None:
-        await bot.say("```py\n"+"ModuleNotFoundError: No module named '"+extension_name+"'\n```")
+    """Reloads an extension."""
+    # Unload
+    success, log = _unload(extension_name)
+    if not success:
+        await bot.say(log)
         return
-    """Unloads an extension."""
-    bot.unload_extension(extension_name)
-    #await bot.say("{} unloaded.".format(extension_name))
-    """Loads an extension."""
-    try:
-        bot.load_extension(extension_name)
-    except (AttributeError, ImportError) as e:
-        await bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+    # Load
+    success, log = _load(extension_name)
+    if not success:
+        await bot.say(log)
         return
     await bot.say("{} reloaded.".format(extension_name))
     
 if __name__ == "__main__":
-    extensionss = []
-    for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
-        extensionss.append(extension)
-        if extension in ignoredmodules:
-            extensionss.pop()
-            continue
-        else:
-            try:
-                bot.load_extension(cogs_dir + "." + extension)
-            except Exception as e:
-                print('Failed to load extension {extension}.'.format(extension))
-                traceback.print_exc()
-    print("Loaded: "+(' '.join(extensionss)))
+    extensions = []
+    for ext in (f.replace('.py', '') for f in glob.glob("%s/*.py" % cogs_dir)):
+        if ext not in ignoredmodules:
+            if _load(ext)[0]:
+                extensions.append(ext)
+    print("Loaded: "+(' '.join(extensions)))
     
     while True:
         try:
@@ -78,4 +85,3 @@ if __name__ == "__main__":
         except:
             traceback.print_exc()
             pass
-    

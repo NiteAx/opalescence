@@ -1,12 +1,16 @@
 import random
 from discord.ext import commands
 
+import sys
+sys.path.append(abspath('..'))  # common.py
+from common import *
+
 class RNG():
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role(*admin_roles)
     async def roll(self, dice : str):
         """Rolls a dice in NdN format."""
         try:
@@ -19,7 +23,7 @@ class RNG():
         await self.bot.say(result)
 
     @commands.command(description='For when you wanna settle the score some other way')
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role(*admin_roles)
     async def choose(self, *choices : str):
         """Chooses between multiple choices."""
         await self.bot.say(random.choice(choices))

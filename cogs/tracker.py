@@ -10,7 +10,10 @@ import re
 from datetime import datetime
 
 embedflag = 0
-ignoredchannels = ['526339834432716815','368960769074921472','217569473698201601','124636360437923840']
+ignoredchannels = ['526339834432716815',  # ?
+                   '368960769074921472',  # ?
+                   '217569473698201601',  # ?
+                   '124636360437923840']  # ?
 commonformat = ['.png','.jpeg','.jpg','.gif']
 
 class Tracker():

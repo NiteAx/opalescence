@@ -9,8 +9,19 @@ parentdir = Path('../')
 dbdir = str(parentdir / 'db.json')
 db  = TinyDB(dbdir)  
 
-#          [manechat,            overflow,             mlp-comics,           mylittletheory,       mylittlebot,          mlp-*,               mlp-spoilers,         nonmlp-spoilers,      mylittleactivities,   mylittlenerds,        mylittlecreativity,   mylittleevents,       sweetielog]
-channels = ['98609319519453184', '160097058261303296', '471371874497069066', '328333020752773121', '144262229691334656', '99319508426035200', '307867080638857216', '414774011105640448', '100087327992348672', '115197908986494983', '408397277510500362', '275467655409041408', '141020464028844033']
+channels = ['98609319519453184',   # manechat
+            '160097058261303296',  # overflow
+            '471371874497069066',  # mlp-comics
+            '328333020752773121',  # mylittletheory
+            '144262229691334656',  # mylittlebot
+            '99319508426035200',   # mlp-*
+            '307867080638857216',  # mlp-spoilers
+            '414774011105640448',  # nonmlp-spoilers
+            '100087327992348672',  # mylittleactivities
+            '115197908986494983',  # mylittlenerds
+            '408397277510500362',  # mylittlecreativity
+            '275467655409041408',  # mylittleevents
+            '141020464028844033']  # sweetielog
 # Move to config.py?
 modrole = '175814520118312960'
 

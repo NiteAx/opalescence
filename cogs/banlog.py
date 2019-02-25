@@ -4,26 +4,28 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from pathlib import Path
 
-scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+sys.path.append(abspath('..'))
+from common import *
 
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+
+# Load log dumper
 parentdir = Path('../')
 dbdir = str(parentdir / 'client_secret.json')
-credentials = ServiceAccountCredentials.from_json_keyfile_name(dbdir, scope)
-gc = gspread.authorize(credentials)
-wks = gc.open("Manechat AiO")
-wks = wks.worksheet("Form Responses 1")
 
 class Banlog():
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role(*admin_roles)
     async def banlog(self, userID : str):
         print(userID)
         if len(userID) <= 18 and userID.isdigit() == False:
             await self.bot.say('```Invalid input.```')
             raise ValueError('Invalid input')
+
         credentials = ServiceAccountCredentials.from_json_keyfile_name(dbdir, scope)
         gc = gspread.authorize(credentials)
         wks = gc.open("Manechat AiO")
@@ -32,6 +34,7 @@ class Banlog():
         if len(results) == 0:
             await self.bot.say('```No results returned for user.```')
             raise IndexError('Length of results is 0.')
+
         userRow = list(reversed(results))[0].row
         userCol = list(reversed(results))[0].col
         uname = wks.cell(userRow,userCol-1).value
@@ -45,7 +48,7 @@ class Banlog():
                 silences = silences+1
             elif title == "Ban":
                 bans = bans+1
-        await self.bot.say('``` ['+uname+'] Warnings: '+str(warnings)+' Silences: '+str(silences)+' Bans: '+str(bans)+'```')
+        await self.bot.say('``` [%s] Warnings: %s Silences: %s Bans: %s```' % (uname, warnings, silences, bans))
         warnings = silences = bans = 0
         for case in reversed(results):
             if (case.col==4) or (case.col==10) or (case.col==17):
@@ -72,9 +75,9 @@ class Banlog():
                 #print(duration+" "+addinfo)
                 #print("------------------------------------")
                 if title == "Warning":
-                    await self.bot.say('['+title+'] '+date+' - '+offense+' | '+addinfo)
+                    await self.bot.say('[%s] %s - %s | %s' % (title, date, offense, addinfo))
                 else:
-                    await self.bot.say('['+title+'] ('+duration+') '+date+' - '+offense+' | '+addinfo)
+                    await self.bot.say('[%s] (%s) %s - %s | %s' % (title, duration, date, offense, addinfo))
             else:
                 await self.bot.say('```Invalid input.```')
                 break
