@@ -123,7 +123,7 @@ class Basic():
             print('Mistmatch between repo and current server invite.')
         await self.bot.delete_invite(invite) #await delete invite 
         message = await self.bot.send_message(ctx.message.channel, '```Rotating invite...```')
-        invite = await self.bot.create_invite(self.bot.get_server('98609319519453184'), max_age=0, unqiue=True) #create new invite
+        invite = await self.bot.create_invite(self.bot.get_channel('552474543067889710'), max_age=0, unqiue=True) #create new invite
         new_indexhtml = indexhtml.replace(discord_invitecode, invite.code)
         with open(indexdir, 'w') as file: #replace invite index.html
             file.write(new_indexhtml)   
