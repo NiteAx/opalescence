@@ -77,5 +77,5 @@ if __name__ == "__main__":
             bot.run(token)
         except ConnectionResetError:
             traceback.print_exc()
-            continue
+            pass
     
