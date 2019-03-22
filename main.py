@@ -82,6 +82,6 @@ if __name__ == "__main__":
     while True:
         try:
             bot.run(token)
-        except:
+        except ConnectionResetError:
             traceback.print_exc()
             pass
