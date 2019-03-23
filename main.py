@@ -6,6 +6,7 @@ import sys
 sys.path.append('..')
 from config import *
 import traceback
+from datetime import datetime
 
 cogs_dir = "cogs"
 
@@ -63,6 +64,8 @@ async def connect():
     while not bot.is_closed:
         try:
             await bot.start(token)
+            bootTime = str(datetime.utcnow()).split('.')[0]+' UTC'
+            await self.bot.send_message(self.bot.get_channel('350179664112779276'), "```Restarted Opalescence at "+bootTime+"```")
         except:
             traceback.print_exc()
             await asyncio.sleep(5)
