@@ -1,4 +1,5 @@
 from discord.ext import commands
+import asyncio
 from os import listdir
 from os.path import isfile, join
 import sys
@@ -56,6 +57,16 @@ async def reload(extension_name : str):
         await bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
         return
     await bot.say("{} reloaded.".format(extension_name))
+
+async def connect():
+    #print('Logging in...')
+    while not bot.is_closed:
+        try:
+            await bot.start(token)
+        except:
+            traceback.print_exc()
+            await asyncio.sleep(5)
+            print("\n---Restarting bot...\n")
     
 if __name__ == "__main__":
     extensionss = []
@@ -72,10 +83,5 @@ if __name__ == "__main__":
                 traceback.print_exc()
     print("Loaded: "+(' '.join(extensionss)))
     
-    while True:
-        try:
-            bot.run(token)
-        except ConnectionResetError:
-            traceback.print_exc()
-            pass
+    bot.loop.run_until_complete(connect())
     
