@@ -21,11 +21,22 @@ class Basic():
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(pass_context=True)
+    @commands.has_any_role('Cool Squad','Admin','Mods')
+    async def echo(self, ctx, chanName : str, *, message: str):
+        chanName = chanName.split('#').pop()
+        if chanName.endswith('>'):
+            chanName = chanName.split('>')[0]
+            chan = discord.utils.get(ctx.message.server.channels, id=chanName)
+        else:
+            chan = discord.utils.get(ctx.message.server.channels, name=chanName)
+        await self.bot.send_message(chan, message)
+    
     @commands.command()
     @commands.has_any_role('Cool Squad','Admin','Mods')
-    async def echo(self, chanID : str, message: str):
-        await self.bot.send_message(self.bot.get_channel(chanID), message)
-
+    async def echomc(self, *, message: str):
+        await self.bot.send_message(self.bot.get_channel('98609319519453184'), message)
+    
     @commands.command()
     @commands.has_any_role('Cool Squad','Admin','Mods')
     async def add(self, left : int, right : int):
@@ -79,6 +90,19 @@ class Basic():
             #print('Assigning role....')
         #else:
             #print('User already has role from list.')
+    
+    @commands.command()
+    @commands.has_any_role('Cool Squad','Admin','Mods')
+    async def stowaways(self):
+        stowaways = "Stowaways:\n"
+        for member in self.bot.get_server('98609319519453184').members:
+            roles = []
+            for role in member.roles:
+                roles.append(role.name)
+            if discord.utils.get(self.bot.get_server('98609319519453184').roles, id='552450130633031700').name not in roles:
+                stowaways += member.mention+'\n'
+        print(stowaways)
+        await self.bot.say(stowaways)
     
     @commands.command(pass_context=True)
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.user)
