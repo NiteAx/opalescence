@@ -102,7 +102,10 @@ class Basic():
             if discord.utils.get(self.bot.get_server('98609319519453184').roles, id='552450130633031700').name not in roles:
                 stowaways += member.mention+'\n'
         print(stowaways)
-        await self.bot.say(stowaways)
+        if stowaways = "Stowaways:\n":
+            await self.bot.say("Hull's clear, cap'n.")
+        else:
+            await self.bot.say(stowaways)
     
     @commands.command(pass_context=True)
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.user)
