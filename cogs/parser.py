@@ -80,7 +80,7 @@ class Parser(): #Finally, parser checks message against revfilter() and deletes 
     # No createWhitelist because we can't create a whitelist without category and value
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def getTemplates(self): #Returns all templates
         if QueryCC('parser', 'template') == False:
             await self.bot.say('```'+'No templates.```')
@@ -91,7 +91,7 @@ class Parser(): #Finally, parser checks message against revfilter() and deletes 
                 await self.bot.say('```'+template['name']+':'+template['value']+'```')
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def getExceptions(self): #Returns all Exceptions
         if QueryCC('parser', 'exception') == False:
             await self.bot.say('```'+'No exceptions.```')
@@ -112,7 +112,7 @@ class Parser(): #Finally, parser checks message against revfilter() and deletes 
             await self.bot.say(constring)
 
     @commands.group()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def deleteWhitelist(self, name : str):
         if RemoveCN('parser', name):
           await self.bot.say('```'+'Deleted '+name+' from Whitelists.```')
@@ -121,7 +121,7 @@ class Parser(): #Finally, parser checks message against revfilter() and deletes 
         return False
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def addTemplate(self, name : str, template : str, ):
         """        
         This function accepts flags, like IGNORECASE. This should be known and decided at this point for eachcase.
@@ -137,7 +137,7 @@ class Parser(): #Finally, parser checks message against revfilter() and deletes 
     # No removeTemplate because a whitelist with no template would break revfilter very badly.
         
     @commands.group()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def addException(self, name : str, exception : str):
         if QueryCN('parser', name) == False:
             #Can't add to non-existent whitelist
@@ -152,7 +152,7 @@ class Parser(): #Finally, parser checks message against revfilter() and deletes 
         
 
     @commands.group()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def deleteException(self, name : str, exception : str):
         expression = exception # TO-DO: Coded like this it only allows cases where the significant term is after the template, not before or inside.
         if RemoveCNCV('parser', name, 'exception', expression):

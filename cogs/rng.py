@@ -6,7 +6,7 @@ class RNG():
         self.bot = bot
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def roll(self, dice : str):
         """Rolls a dice in NdN format."""
         try:
@@ -19,7 +19,7 @@ class RNG():
         await self.bot.say(result)
 
     @commands.command(description='For when you wanna settle the score some other way')
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def choose(self, *choices : str):
         """Chooses between multiple choices."""
         await self.bot.say(random.choice(choices))

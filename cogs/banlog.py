@@ -18,7 +18,7 @@ class Banlog():
         self.bot = bot
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def banlog(self, userID : str):
         print(userID)
         if len(userID) <= 18 and userID.isdigit() == False:

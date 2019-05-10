@@ -22,7 +22,7 @@ class Basic():
         self.bot = bot
 
     @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def echo(self, ctx, chanName : str, *, message: str):
         chanName = chanName.split('#').pop()
         if chanName.endswith('>'):
@@ -33,18 +33,18 @@ class Basic():
         await self.bot.send_message(chan, message)
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def echomc(self, *, message: str):
         await self.bot.send_message(self.bot.get_channel('98609319519453184'), message)
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def add(self, left : int, right : int):
         """Adds two numbers together."""
         await self.bot.say(left + right)
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def repeat(self,  times : int, content : str):
         """Repeats a message multiple times."""
         if times < 6:
@@ -54,7 +54,7 @@ class Basic():
             await self.bot.say("Please don't get me banned by Discord!")
     
     @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods') 
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie') 
     async def listrole(self, ctx, *, rolename : str):
         roles = ctx.message.server.roles
         for role in (y for y in roles if y.name.lower() == rolename.lower()):
@@ -62,14 +62,14 @@ class Basic():
             await self.bot.say('```'+role.name+': '+role.id+'```')
 
     @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods') 
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie') 
     async def listroles(self, ctx):
         roles = ctx.message.server.roles
         for role in (y for y in roles if y.name != '@everyone'):
             print(role.name +' '+ role.id)
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def remindme(self, time : int, reminder : str):
         await self.bot.say('```Reminder set for '+str(time)+' seconds from now.```')
         await asyncio.sleep(time)
@@ -92,7 +92,7 @@ class Basic():
             #print('User already has role from list.')
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def stowaways(self):
         stowaways = "Stowaways:\n"
         for member in self.bot.get_server('98609319519453184').members:
@@ -136,7 +136,7 @@ class Basic():
                 await self.bot.delete_message(notwhitelisted)
                 
     @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods')
+    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
     async def rotate(self, ctx): 
         print('----Pulling repo')
         subprocess.call(["git", "-C", repodir, "pull"]) #git pull repo
