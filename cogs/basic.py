@@ -13,7 +13,7 @@ from pathlib import Path
 
 roles=['540526908794732545','540526928445177858','540526948493819933','540526971222753291','540526982170017802','540526992752246786','540527002483163157']
 repodir = Path('../manechat.github.io')
-indexdir = str(repodir / 'index.html')
+indexdir = str(repodir / 'invite.txt')
 repodir = str(repodir)
 pingtime = 60
 
@@ -137,30 +137,35 @@ class Basic():
                 
     @commands.command(pass_context=True)
     @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def rotate(self, ctx): 
+    async def rotate(self, ctx):
+        print(ctx.message.author.name+' used ?rotate at '+str(datetime.datetime.now()))
         print('----Pulling repo')
         subprocess.call(["git", "-C", repodir, "pull"]) #git pull repo
         with open(indexdir, 'r') as f: #find homepage invite from index.html
-            indexhtml = f.read()
-        discord_inviteURL = re.search(r'<a href="https:\/\/(discord.gg\/+[a-zA-Z0-9]+)" class="modal-link">JOIN<\/a>', indexhtml).group(1)
+            invitetxt = f.read()
+            print('invitetxt = '+invitetxt)
+        discord_inviteURL = invitetxt
         discord_invitecode = discord_inviteURL.split('discord.gg/')[1]
+        print('discord_invitecode = '+discord_invitecode)
         try:
             invite = await self.bot.get_invite(discord_inviteURL)
+            await self.bot.delete_invite(invite) #await delete invite 
+            message = await self.bot.send_message(ctx.message.channel, '```Rotating invite...```')
+            invite = await self.bot.create_invite(self.bot.get_channel('552474543067889710'), max_age=0, unqiue=True) #create new invite
+            new_invitetxt = invitetxt.replace(discord_invitecode, invite.code)
+            with open(indexdir, 'w') as file: #replace invite index.html
+                file.write(new_invitetxt)   
+            #git push to remote
+            print('----Adding changes')
+            subprocess.call(["git", "-C", repodir, "add", "-u",])
+            print('----Comitting')
+            subprocess.call(["git", "-C", repodir, "commit", "-m", "Rotate the invite link"])
+            print('----Pushing to remote')
+            subprocess.call(["git", "-C", repodir, "push"])
+            await self.bot.edit_message(message, '```Rotated invite.```')
         except:
             print('Mistmatch between repo and current server invite.')
-        await self.bot.delete_invite(invite) #await delete invite 
-        message = await self.bot.send_message(ctx.message.channel, '```Rotating invite...```')
-        invite = await self.bot.create_invite(self.bot.get_channel('552474543067889710'), max_age=0, unqiue=True) #create new invite
-        new_indexhtml = indexhtml.replace(discord_invitecode, invite.code)
-        with open(indexdir, 'w') as file: #replace invite index.html
-            file.write(new_indexhtml)   
-        #git push to remote
-        print('----Adding changes')
-        subprocess.call(["git", "-C", repodir, "add", "-u",])
-        print('----Comitting')
-        subprocess.call(["git", "-C", repodir, "commit", "-m", "Rotate the invite link"])
-        print('----Pushing to remote')
-        subprocess.call(["git", "-C", repodir, "push"])
-        await self.bot.edit_message(message, '```Rotated invite.```')
+            await self.bot.send_message(ctx.message.channel, '```Mistmatch between repo and current server invite.```')
+        
 def setup(bot):
     bot.add_cog(Basic(bot))
