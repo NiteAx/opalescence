@@ -1,4 +1,4 @@
-# Opalescence
+# Opalescence 🐱
 
 Opalescence is a niche-purpose Discord bot written in Python using [discord.py](https://github.com/Rapptz/discord.py) (async branch)
 For the most part, it is largely just a way for me to learn how to do things in Python during my free time. 
