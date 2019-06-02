@@ -64,7 +64,7 @@ async def reload(extension_name : str):
 async def status_task():
     while True:
         count = bot.get_server('98609319519453184').member_count
-        status1 = discord.Game(name='with '+str(count)+' ponies')
+        status1 = discord.Game(name='with '+str(count)+' ponies',type=1)
         await bot.change_presence(game=status1)
         await asyncio.sleep(10)
     
