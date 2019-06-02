@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 import asyncio
 from os import listdir
@@ -18,6 +19,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    bot.loop.create_task(status_task())
 
 @bot.command()
 @commands.has_any_role('Cool Squad','Admin','Mods')
@@ -59,6 +61,14 @@ async def reload(extension_name : str):
         return
     await bot.say("{} reloaded.".format(extension_name))
 
+async def status_task():
+    while True:
+        count = bot.get_server('98609319519453184').member_count
+        status1 = discord.Game(name='with '+str(count)+' ponies')
+        await bot.change_presence(game=status1)
+        await asyncio.sleep(10)
+    
+    
 async def connect():
     #print('Logging in...')
     while not bot.is_closed:
