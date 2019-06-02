@@ -44,7 +44,7 @@ class Tracker():
     """
     async def on_message_delete(self, message):
         if message.server.id == '98609319519453184':
-            if message.channel.id not in ignoredchannels:
+            if (message.channel.id not in ignoredchannels) and (message.author.id != '235088799074484224'):
                 if len(message.content) == 0:   #If message has no text
                     msgcontent = message.content    #Message is empty
                 else:
