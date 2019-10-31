@@ -12,9 +12,9 @@ class Spooky():
     
     async def on_message(self, message): #Listen to messages
         if message.server.id == '98609319519453184': #Only listen to manechat
-          if message.channel.id == '141020464028844033': #sweetielog
+          if message.channel.id == '144262229691334656' or message.channel.id == '141020464028844033': #mylittlebot or sweetielog
             if message.author.id != '349942347905236992': #Ignore yourself
-                if 'trick or treat' in message.content:
+                if 'trick or treat' in message.content.lower():
                     print(message.author.name+' said Trick or Treat!')
                     trickrole = discord.utils.get(message.server.roles, id='639108145674846239')
                     chosenrole = discord.utils.get(message.server.roles, id=random.choice(roles))
@@ -34,10 +34,10 @@ class Spooky():
                             await self.bot.send_message(self.bot.get_channel(message.channel.id), 'Tricked!')
                             await asyncio.sleep(3)
                             #await self.bot.add_roles(user, trickrole)
-                            await self.bot.send_message(self.bot.get_channel('141020464028844033'), '!assignrole @Trrrixed <@'+message.author.id+'> for: 1 minute')
+                            await self.bot.send_message(self.bot.get_channel('141020464028844033'), '!assignrole @Trrrixed <@'+message.author.id+'> for: 2 minutes')
                     else:
                         print('User already has role from list.')
-                        await self.bot.send_message(self.bot.get_channel(message.channel.id), 'F off with ur bs m8')
+                        await self.bot.send_message(self.bot.get_channel(message.channel.id), "You've already joined a role, silly!")
                     
 def setup(bot):
     bot.add_cog(Spooky(bot))
