@@ -2,20 +2,21 @@ import discord
 import random
 import asyncio
 
-roles = ['638752293541511199','638752350542102560']
+roles = ['639240512716406789','639108166721863701']
 
-# trick: 638752293541511199, treat: 638752350542102560
+# trrrixed:639108145674846239  tricked: 639240512716406789, treat: 639108166721863701
 
 class Spooky():
     def __init__(self, bot):
         self.bot = bot
     
     async def on_message(self, message): #Listen to messages
-        if message.server.id == '349941841862459413': #Only listen to test server
-          if message.channel.id == '638752113370988575': #Trick Or Treat (test server)
+        if message.server.id == '98609319519453184': #Only listen to manechat
+          if message.channel.id == '141020464028844033': #sweetielog
             if message.author.id != '349942347905236992': #Ignore yourself
                 if 'trick or treat' in message.content:
                     print(message.author.name+' said Trick or Treat!')
+                    trickrole = discord.utils.get(message.server.roles, id='639108145674846239')
                     chosenrole = discord.utils.get(message.server.roles, id=random.choice(roles))
                     print('Random Role: '+chosenrole.name+' '+chosenrole.id)
                     user = message.author
@@ -27,16 +28,16 @@ class Spooky():
                     if set(roles).isdisjoint(set(memberoles)):
                         await self.bot.add_roles(user, chosenrole)
                         print('Assigning role....')
-                        if chosenrole.id == '638752350542102560':
-                            await self.bot.send_message(self.bot.get_channel('638752113370988575'), 'Treats!')
+                        if chosenrole.id == '639108166721863701':
+                            await self.bot.send_message(self.bot.get_channel(message.channel.id), 'Treats!')
                         else:
-                            await self.bot.send_message(self.bot.get_channel('638752113370988575'), 'Tricked!')
+                            await self.bot.send_message(self.bot.get_channel(message.channel.id), 'Tricked!')
                             await asyncio.sleep(3)
-                            await self.bot.send_message(self.bot.get_channel('638752113370988575'), '!banish <@'+message.author.id+'> for: 2 minutes')
+                            #await self.bot.add_roles(user, trickrole)
+                            await self.bot.send_message(self.bot.get_channel('141020464028844033'), '!assignrole @Trrrixed <@'+message.author.id+'> for: 1 minute')
                     else:
                         print('User already has role from list.')
-                        await self.bot.send_message(self.bot.get_channel('638752113370988575'), 'F off with ur bs m8')
-                    #Post message "Treats!"/"Tricked!", delay, assign role, moon command
+                        await self.bot.send_message(self.bot.get_channel(message.channel.id), 'F off with ur bs m8')
                     
 def setup(bot):
     bot.add_cog(Spooky(bot))
