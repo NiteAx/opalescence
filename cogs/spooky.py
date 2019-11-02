@@ -1,3 +1,4 @@
+#this module is currently disabled in config
 import discord
 import random
 import asyncio
