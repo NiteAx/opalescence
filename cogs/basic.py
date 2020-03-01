@@ -11,7 +11,11 @@ import re
 import subprocess
 from pathlib import Path
 
-roles=['672990112774094898','672990213986844712','672990221855490058','672990225047486464','672990228901789716','672990232488181810','672990235558412291']
+#Joinrole related
+roles=['683620628682899466','683620633891962957','683620640141344769','683620646634127383','683620652686508084','683620659385073717']
+responses=["I just don't know what went wrong! <a:derp:554593471089082378>", "Oops, my bad! <:derpysad:587780328765259776>", "All done! <a:derpysmile:399726352758079498>", "Want a complimentary muffin? <a:derpysmile:399726352758079498>" , "Break time!"]
+breaktime=[" <:derpystop:585590699307696159>", " <:derpysleep:588652359450886154>", " <a:derpywave:585560131140452389>"]
+
 repodir = Path('../manechat.github.io')
 indexdir = str(repodir / 'invite.txt')
 repodir = str(repodir)
@@ -75,7 +79,7 @@ class Basic():
         await asyncio.sleep(time)
         await self.bot.say(reminder)
     
-    @commands.command(pass_context=True, aliases=['dashmyrainbow','20%cooler','awwyeah','rainbowdash','rdwut','ceruleanblue',"I'mshaking"])
+    @commands.command(pass_context=True, aliases=['cyan','magenta','yellow','green','purple','orange'])
     async def joinrole(self, ctx):
         chosenrole = discord.utils.get(ctx.message.server.roles, id=random.choice(roles))
         #print('Random Role: '+chosenrole.name+' '+chosenrole.id)
@@ -87,6 +91,12 @@ class Basic():
         #print(memberoles)
         if set(roles).isdisjoint(set(memberoles)):
             await self.bot.add_roles(user, chosenrole)
+            response = random.choice(responses)
+            if response == "Break time!":
+                await self.bot.remove_roles(user, chosenrole)
+                await self.bot.say(response+random.choice(breaktime))
+            else:
+                await self.bot.say(response)
             #print('Assigning role....')
         #else:
             #print('User already has role from list.')
