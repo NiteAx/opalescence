@@ -1,3 +1,6 @@
+#Keeps track of deleted messages and logs them to a logging channel in a test server
+#Keeps track of reactions added and removed from messages posted since bot's last startup
+
 from discord.ext import commands
 import discord
 import sys
@@ -7,10 +10,11 @@ import asyncio
 import random
 import time
 import re
+import datetime
 from datetime import datetime
 
 embedflag = 0
-ignoredchannels = ['526339834432716815','124636360437923840']
+ignoredchannels = ['526339834432716815'] #sweetielog
 commonformat = ['.png','.jpeg','.jpg','.gif']
 
 class Tracker():
@@ -99,15 +103,15 @@ class Tracker():
                 
     async def on_reaction_add(self, reaction, user):
         if reaction.custom_emoji == True:
-            print(user.name+" reacted : "+reaction.emoji.name)
+            print(user.name+" reacted : "+reaction.emoji.name+" at "+str(datetime.now()))
         else:
-            print(user.name+" reacted : "+reaction.emoji)
+            print(user.name+" reacted : "+reaction.emoji+" at "+str(datetime.now()))
     
     async def on_reaction_remove(self, reaction, user):
         if reaction.custom_emoji == True:
-            print(user.name+" removed reaction : "+reaction.emoji.name)
+            print(user.name+" removed reaction : "+reaction.emoji.name+" at "+str(datetime.now()))
         else:
-            print(user.name+" removed reaction : "+reaction.emoji)
+            print(user.name+" removed reaction : "+reaction.emoji+" at "+str(datetime.now()))
     """
     @commands.command(pass_context=True)
     @commands.has_any_role('Cool Squad','Admin','Mods')

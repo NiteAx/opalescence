@@ -9,8 +9,6 @@ parentdir = Path('../')
 dbdir = str(parentdir / 'db.json')
 db  = TinyDB(dbdir)  
 
-#          [manechat,            overflow,             mlp-comics,           mylittletheory,       mylittlebot,          mlp-*,               mlp-spoilers,         nonmlp-spoilers,      mylittleactivities,   mylittlenerds,        mylittlecreativity,   mylittleevents,       sweetielog]
-channels = ['98609319519453184', '160097058261303296', '471371874497069066', '328333020752773121', '144262229691334656', '99319508426035200', '307867080638857216', '414774011105640448', '100087327992348672', '115197908986494983', '408397277510500362', '275467655409041408', '141020464028844033']
 # Move to config.py?
 modrole = '175814520118312960'
 
@@ -57,25 +55,23 @@ class Parser(): #Finally, parser checks message against revfilter() and deletes 
 
     async def on_message(self, message): #Listen to messages
         if message.server.id == '98609319519453184': #Only listen to Manechat
-          if message.channel.id in channels: #Sweetielog
-            if message.author.id != '349942347905236992': #Ignore yourself
-              if message.author.top_role.id != modrole: #Ignore mods
-                if revfilter(message.content) == True:
-                    #print(message.author.top_role.id)
-                    #print('Deleting pleb')
-                    await self.bot.delete_message(message)
-                    await self.bot.send_message(self.bot.get_channel('141020464028844033'), '```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
+          if message.author.id != '349942347905236992': #Ignore yourself
+            if message.author.top_role.id != modrole: #Ignore mods
+              if revfilter(message.content) == True:
+                #print(message.author.top_role.id)
+                #print('Deleting pleb')
+                await self.bot.delete_message(message)
+                await self.bot.send_message(self.bot.get_channel('141020464028844033'), '```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
                   
     async def on_message_edit(self, before, after): #Listen to message edits
         if after.server.id == '98609319519453184': #Only listen to Manechat
-          if after.channel.id in channels: #Sweetielog
-            if after.author.id != '349942347905236992': #Ignore yourself
-              if after.author.top_role.id != modrole: #Ignore mods
-                if revfilter(after.content) == True:
-                    #print(after.author.top_role.id)
-                    #print('Deleting pleb')
-                    await self.bot.delete_message(after)
-                    await self.bot.send_message(self.bot.get_channel('141020464028844033'), '```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
+          if after.author.id != '349942347905236992': #Ignore yourself
+            if after.author.top_role.id != modrole: #Ignore mods
+              if revfilter(after.content) == True:
+                #print(after.author.top_role.id)
+                #print('Deleting pleb')
+                await self.bot.delete_message(after)
+                await self.bot.send_message(self.bot.get_channel('141020464028844033'), '```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
               
     # No createWhitelist because we can't create a whitelist without category and value
     
