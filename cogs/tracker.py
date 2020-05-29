@@ -93,13 +93,13 @@ class Tracker():
                         embedflag = 1
                     else:
                         embedflag = 0
-                if embedflag == 1:
+                if embedflag == 1: #If we have created an embed (message had image), post to #sweetielog
                     identifier = '<@'+message.author.id+'>'
                     deletetime = str(datetime.utcnow()).split('.')[0]+' UTC'
                     embed.set_footer(text=deletetime+' '+identifier)        
                     await self.bot.send_message(self.bot.get_channel('141020464028844033'), embed=embed)
-                else:
-                    await self.bot.send_message(self.bot.get_channel('349945916779921408'), '['+(str(message.timestamp)).split('.')[0]+' UTC'+'] #'+message.channel.name+' '+message.author.name+' : '+message.content)
+                else: #If we don't have an embed (message contains no image), post to test server logging channel
+                    await self.bot.send_message(self.bot.get_channel('349945916779921408'), '['+(str(message.timestamp)).split('.')[0]+' UTC'+'] #'+message.channel.name+' '+message.author.name+' ('+message.author.id+')'+' : '+message.content)
                 
     async def on_reaction_add(self, reaction, user):
         if reaction.custom_emoji == True:
