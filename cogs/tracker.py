@@ -112,19 +112,10 @@ class Tracker():
             print(user.name+" removed reaction : "+reaction.emoji.name+" at "+str(datetime.now()))
         else:
             print(user.name+" removed reaction : "+reaction.emoji+" at "+str(datetime.now()))
-    """
-    @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods')
-    async def count(self, ctx):        
-        print(ctx.message.author.name+" : "+ctx.message.content)
-        print(ctx.message.channel.name)
-        counter = 0
-        async for msg in self.bot.logs_from(ctx.message.channel, limit=10000):
-            if msg.author == ctx.message.author:
-                counter += 1
-            #print(msg.content)
-        print(counter)
-        await self.bot.say("```You have posted "+str(counter)+" messages in the past 10000 messages in this channel.```")    
-    """
+    
+    async def on_member_remove(self, member):
+        if member.server.id == '98609319519453184':
+            await self.bot.send_message(self.bot.get_channel('349945916779921408'), member.name+' ('+member.id+') left the server.')
+    
 def setup(bot):
     bot.add_cog(Tracker(bot))
