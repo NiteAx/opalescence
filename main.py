@@ -1,17 +1,16 @@
 import discord
 from discord.ext import commands
 import asyncio
+
 from os import listdir
 from os.path import isfile, join
 import sys
 sys.path.append('..')
 from config import *
-import traceback
-from datetime import datetime
-
-cogs_dir = "cogs"
 
 bot = commands.Bot(command_prefix='?')
+
+cogs_dir = "cogs"
 
 @bot.event
 async def on_ready():
@@ -20,66 +19,52 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     bot.loop.create_task(status_task())
-
-@bot.command()
-@commands.has_any_role('Cool Squad','Admin','Mods')
-async def load(extension_name : str):
-    """Loads an extension."""
-    try:
-        bot.load_extension(extension_name)
-    except (AttributeError, ImportError) as e:
-        await bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
-        return
-    await bot.say("{} loaded.".format(extension_name))
-
-@bot.command()
-@commands.has_any_role('Cool Squad','Admin','Mods')
-async def unload(extension_name : str):
-    module = bot.extensions.get(extension_name)
-    if module is None:
-        await bot.say("```py\n"+"ModuleNotFoundError: No module named '"+extension_name+"'\n```")
-        return
-    """Unloads an extension."""
-    bot.unload_extension(extension_name)
-    await bot.say("{} unloaded.".format(extension_name))
     
 @bot.command()
-@commands.has_any_role('Cool Squad','Admin','Mods')
-async def reload(extension_name : str):
-    module = bot.extensions.get(extension_name)
-    if module is None:
-        await bot.say("```py\n"+"ModuleNotFoundError: No module named '"+extension_name+"'\n```")
-        return
-    """Unloads an extension."""
-    bot.unload_extension(extension_name)
-    #await bot.say("{} unloaded.".format(extension_name))
+@commands.has_any_role(*Whitelist)
+async def load(ctx, extension_name : str):
     """Loads an extension."""
     try:
         bot.load_extension(extension_name)
     except (AttributeError, ImportError) as e:
-        await bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+        await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
         return
-    await bot.say("{} reloaded.".format(extension_name))
-
+    await ctx.send("{} loaded.".format(extension_name))
+    
+@bot.command()
+@commands.has_any_role(*Whitelist)
+async def unload(ctx, extension_name : str):
+    module = bot.extensions.get(extension_name)
+    if module is None:
+        await ctx.send("```py\n"+"ModuleNotFoundError: No module named '"+extension_name+"'\n```")
+        return
+    """Unloads an extension."""
+    bot.unload_extension(extension_name)
+    await ctx.send("{} unloaded.".format(extension_name))
+    
+@bot.command()
+@commands.has_any_role(*Whitelist)
+async def reload(ctx, extension_name : str):
+    module = bot.extensions.get(extension_name)
+    if module is None:
+        await ctx.send("```py\n"+"ModuleNotFoundError: No module named '"+extension_name+"'\n```")
+        return
+    """Unloads an extension."""
+    bot.unload_extension(extension_name)
+    """Loads an extension."""
+    try:
+        bot.load_extension(extension_name)
+    except (AttributeError, ImportError) as e:
+        await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+        return
+    await ctx.send("{} reloaded.".format(extension_name))
+    
 async def status_task():
     while True:
-        count = bot.get_server('98609319519453184').member_count
-        status1 = discord.Game(name='with '+str(count)+' ponies',type=1)
-        await bot.change_presence(game=status1)
+        manechat = bot.get_guild(98609319519453184)
+        status1 = discord.Game('with '+str(manechat.member_count)+' ponies')
+        await bot.change_presence(activity=status1)
         await asyncio.sleep(10)
-    
-    
-async def connect():
-    #print('Logging in...')
-    while not bot.is_closed:
-        try:
-            await bot.start(token)
-            bootTime = str(datetime.utcnow()).split('.')[0]+' UTC'
-            await self.bot.send_message(self.bot.get_channel('350179664112779276'), "```Restarted Opalescence at "+bootTime+"```")
-        except:
-            traceback.print_exc()
-            await asyncio.sleep(5)
-            print("\n---Restarting bot...\n")
     
 if __name__ == "__main__":
     extensionss = []
@@ -96,5 +81,4 @@ if __name__ == "__main__":
                 traceback.print_exc()
     print("Loaded: "+(' '.join(extensionss)))
     
-    bot.loop.run_until_complete(connect())
-    
+bot.run(token)
