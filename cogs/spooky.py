@@ -1,5 +1,6 @@
 #this module is currently disabled in config
 import discord
+from discord.ext import commands
 import random
 import asyncio
 
@@ -7,7 +8,7 @@ roles = ['639240512716406789','639108166721863701']
 
 # trrrixed:639108145674846239  tricked: 639240512716406789, treat: 639108166721863701
 
-class Spooky():
+class Spooky(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     

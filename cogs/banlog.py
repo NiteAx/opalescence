@@ -13,7 +13,7 @@ gc = gspread.authorize(credentials)
 wks = gc.open("Manechat AiO")
 wks = wks.worksheet("Form Responses 1")
 
-class Banlog():
+class Banlog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

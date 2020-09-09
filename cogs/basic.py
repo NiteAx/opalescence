@@ -21,68 +21,69 @@ indexdir = str(repodir / 'invite.txt')
 repodir = str(repodir)
 pingtime = 60
 
-class Basic():
+class Basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
+    @commands.command()
+    @commands.has_any_role(*Whitelist)
+    async def add(self, ctx, left : int, right : int):
+        """Adds two numbers together."""
+        await ctx.send(left + right)
+    
+    #bad channel parsing
+    @commands.command()
+    @commands.has_any_role(*Whitelist)
     async def echo(self, ctx, chanName : str, *, message: str):
         chanName = chanName.split('#').pop()
         if chanName.endswith('>'):
             chanName = chanName.split('>')[0]
-            chan = discord.utils.get(ctx.message.server.channels, id=chanName)
+            chan = discord.utils.get(ctx.message.guild.channels, id=chanName)
         else:
-            chan = discord.utils.get(ctx.message.server.channels, name=chanName)
-        await self.bot.send_message(chan, message)
+            chan = discord.utils.get(ctx.message.guild.channels, name=chanName)
+        await chan.send(message)
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def echomc(self, *, message: str):
-        await self.bot.send_message(self.bot.get_channel('98609319519453184'), message)
+    @commands.has_any_role(*Whitelist)
+    async def echomc(self, ctx, *, message: str):
+        await self.bot.get_channel(98609319519453184).send(message)
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def add(self, left : int, right : int):
-        """Adds two numbers together."""
-        await self.bot.say(left + right)
-
-    @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def repeat(self,  times : int, content : str):
+    @commands.has_any_role(*Whitelist)
+    async def repeat(self, ctx, times : int, content : str):
         """Repeats a message multiple times."""
         if times < 6:
             for i in range(times):
-                await self.bot.say(content)
+                await ctx.send(content)
         else:
-            await self.bot.say("Please don't get me banned by Discord!")
+            await ctx.send("Please don't get me banned by Discord! (Max 5)")
     
     @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie') 
-    async def listrole(self, ctx, *, rolename : str):
-        roles = ctx.message.server.roles
+    @commands.has_any_role(*Whitelist)
+    async def roleid(self, ctx, *, rolename : str):
+        roles = ctx.message.guild.roles
         for role in (y for y in roles if y.name.lower() == rolename.lower()):
-            print(role.name+': '+role.id) 
-            await self.bot.say('```'+role.name+': '+role.id+'```')
+            print(role.name+': '+str(role.id)) 
+            await ctx.send('```'+role.name+': '+str(role.id)+'```')
 
     @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie') 
+    @commands.has_any_role(*Whitelist)
     async def listroles(self, ctx):
-        roles = ctx.message.server.roles
+        roles = ctx.message.guild.roles
         for role in (y for y in roles if y.name != '@everyone'):
-            print(role.name +' '+ role.id)
+            print(role.name +' '+ str(role.id))
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def remindme(self, time : int, reminder : str):
-        await self.bot.say('```Reminder set for '+str(time)+' seconds from now.```')
+    @commands.has_any_role(*Whitelist)
+    async def remindme(self, ctx, time : int, reminder : str):
+        await ctx.send('```Reminder set for '+str(time)+' seconds from now.```')
         await asyncio.sleep(time)
-        await self.bot.say(reminder)
+        await ctx.send(reminder)
     
-    @commands.command(pass_context=True, aliases=['cyan','magenta','yellow','green','purple','orange'])
+    @commands.command(pass_context=True)
     async def joinrole(self, ctx):
-        chosenrole = discord.utils.get(ctx.message.server.roles, id=random.choice(roles))
-        #print('Random Role: '+chosenrole.name+' '+chosenrole.id)
+        chosenrole = discord.utils.get(ctx.message.guild.roles, id=random.choice(roles))
+        #print('Random Role: '+chosenrole.name+' '+str(chosenrole.id))
         user = ctx.message.author
         memberoles = []
         for role in user.roles:
@@ -90,32 +91,32 @@ class Basic():
         #print("Member Role ID's:")
         #print(memberoles)
         if set(roles).isdisjoint(set(memberoles)):
-            await self.bot.add_roles(user, chosenrole)
+            await user.add_roles(chosenrole)
             response = random.choice(responses)
             if response == "Break time!":
-                await self.bot.remove_roles(user, chosenrole)
-                await self.bot.say(response+random.choice(breaktime))
+                await user.remove_roles(chosenrole)
+                await ctx.send(response+random.choice(breaktime))
             else:
-                await self.bot.say(response)
+                await ctx.send(response)
             #print('Assigning role....')
         #else:
             #print('User already has role from list.')
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def stowaways(self):
+    @commands.has_any_role(*Whitelist)
+    async def stowaways(self, ctx):
         stowaways = "Stowaways:\n"
-        for member in self.bot.get_server('98609319519453184').members:
+        for member in self.bot.get_guild(98609319519453184).members:
             roles = []
             for role in member.roles:
                 roles.append(role.name)
-            if discord.utils.get(self.bot.get_server('98609319519453184').roles, id='552450130633031700').name not in roles:
+            if discord.utils.get(self.bot.get_guild(98609319519453184).roles, id=552450130633031700).name not in roles:
                 stowaways += member.mention+'\n'
         print(stowaways)
         if stowaways == "Stowaways:\n":
-            await self.bot.say("Hull's clear, cap'n.")
+            await ctx.send("Hull's clear, cap'n.")
         else:
-            await self.bot.say(stowaways)
+            await ctx.send(stowaways)
     
     @commands.command(pass_context=True)
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.user)
@@ -124,29 +125,29 @@ class Basic():
                     ctx.command.reset_cooldown(ctx)
         if ctx.message.author.top_role.id != newprole: #ignore newp
             if any(pingrole.lower() == role.lower() for pingrole in pingwhitelist):
-                print(ctx.message.author.name+' used ?ping'+role+' at '+str(datetime.datetime.now()))
-                roles = ctx.message.server.roles
+                print(ctx.message.author.name+' used ?ping '+role+' at '+str(datetime.datetime.now()))
+                roles = ctx.message.guild.roles
                 roles = [r.name for r in roles]
                 for r in (y for y in roles if y.lower() == role.lower()):
                     pingrole = r
                 r = pingrole
-                pingrole = discord.utils.get(ctx.message.server.roles, name=r)
-                await self.bot.edit_role(ctx.message.server, pingrole, mentionable=True)
-                nowpingable = await self.bot.say('```'+r+' is now pingable for '+str(pingtime)+' seconds.```')
+                pingrole = discord.utils.get(ctx.message.guild.roles, name=r)
+                await pingrole.edit(mentionable=True)
+                nowpingable = await ctx.send('```'+r+' is now pingable for '+str(pingtime)+' seconds.```')
                 await asyncio.sleep(pingtime)
-                await self.bot.edit_role(ctx.message.server, pingrole, mentionable=False)
-                await self.bot.delete_message(ctx.message)
-                await self.bot.delete_message(nowpingable)
+                await pingrole.edit(mentionable=False)
+                await ctx.message.delete()
+                await nowpingable.delete()
             else:
                 print(ctx.message.author.name+' failed to use ?ping '+role+' at '+str(datetime.datetime.now()))
-                notwhitelisted = await self.bot.say('```'+role+' is not whitelisted.```')
+                notwhitelisted = await ctx.send('```'+role+' is not whitelisted.```')
                 ctx.command.reset_cooldown(ctx)
                 await asyncio.sleep(5)
-                await self.bot.delete_message(ctx.message)
-                await self.bot.delete_message(notwhitelisted)
+                await ctx.message.delete()
+                await notwhitelisted.delete()
                 
     @commands.command(pass_context=True)
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
+    @commands.has_any_role(*Whitelist)
     async def rotate(self, ctx):
         print(ctx.message.author.name+' used ?rotate at '+str(datetime.datetime.now()))
         print('----Pulling repo')
@@ -158,10 +159,10 @@ class Basic():
         discord_invitecode = discord_inviteURL.split('discord.gg/')[1]
         print('discord_invitecode = '+discord_invitecode)
         try:
-            invite = await self.bot.get_invite(discord_inviteURL)
-            await self.bot.delete_invite(invite) #await delete invite 
-            message = await self.bot.send_message(ctx.message.channel, '```Rotating invite...```')
-            invite = await self.bot.create_invite(self.bot.get_channel('648943910013501448'), max_age=0, unqiue=True) #create new invite
+            invite = await self.bot.fetch_invite(discord_inviteURL)
+            await invite.delete() #await delete invite 
+            message = await ctx.send('```Rotating invite...```')
+            invite = await self.bot.get_channel(648943910013501448).create_invite(max_age=0, unique=True) #create new invite
             new_invitetxt = invitetxt.replace(discord_invitecode, invite.code)
             with open(indexdir, 'w') as file: #replace invite index.html
                 file.write(new_invitetxt)   
@@ -172,10 +173,10 @@ class Basic():
             subprocess.call(["git", "-C", repodir, "commit", "-m", "Rotate the invite link"])
             print('----Pushing to remote')
             subprocess.call(["git", "-C", repodir, "push"])
-            await self.bot.edit_message(message, '```Rotated invite.```')
+            await message.edit(content='```Rotated invite.```')
         except:
             print('Mistmatch between repo and current server invite.')
-            await self.bot.send_message(ctx.message.channel, '```Mistmatch between repo and current server invite.```')
+            await ctx.send('```Mistmatch between repo and current server invite.```')
         
 def setup(bot):
     bot.add_cog(Basic(bot))

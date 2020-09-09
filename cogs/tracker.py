@@ -17,7 +17,7 @@ embedflag = 0
 ignoredchannels = ['526339834432716815'] #sweetielog
 commonformat = ['.png','.jpeg','.jpg','.gif']
 
-class Tracker():
+class Tracker(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

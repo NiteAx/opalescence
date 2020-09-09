@@ -49,7 +49,7 @@ def revfilter(msg): #First, a filter is constructed based on stuff
             elif flag < len(occurrences):
                 return True
                 
-class Parser(): #Finally, parser checks message against revfilter() and deletes if necessary 
+class Parser(commands.Cog): #Finally, parser checks message against revfilter() and deletes if necessary 
     def __init__(self, bot):
         self.bot = bot
 
