@@ -125,7 +125,7 @@ class Basic(commands.Cog):
                     ctx.command.reset_cooldown(ctx)
         if ctx.message.author.top_role.id != newprole: #ignore newp
             if any(pingrole.lower() == role.lower() for pingrole in pingwhitelist):
-                print(ctx.message.author.name+' used ?ping '+role+' at '+str(datetime.datetime.now()))
+                print('['+(str(datetime.now())).split('.')[0]+' UTC] '+ctx.message.author.name+' used ?ping '+role)
                 roles = ctx.message.guild.roles
                 roles = [r.name for r in roles]
                 for r in (y for y in roles if y.lower() == role.lower()):
