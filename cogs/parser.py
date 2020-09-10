@@ -4,13 +4,14 @@ import re
 from cogs.storage import *
 from tinydb import TinyDB, Query
 from pathlib import Path
+from config import *
 
 parentdir = Path('../')
 dbdir = str(parentdir / 'db.json')
 db  = TinyDB(dbdir)  
 
 # Move to config.py?
-modrole = '175814520118312960'
+modrole = 175814520118312960
 
 def revfilter(msg): #First, a filter is constructed based on stuff
     #print('-------------------------------------------------------\nMessage: '+msg)
@@ -53,44 +54,46 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
     async def on_message(self, message): #Listen to messages
-        if message.server.id == '98609319519453184': #Only listen to Manechat
-          if message.author.id != '349942347905236992': #Ignore yourself
+        if message.guild.id == 98609319519453184: #Only listen to Manechat
+          if message.author.id != 349942347905236992: #Ignore yourself
             if message.author.top_role.id != modrole: #Ignore mods
               if revfilter(message.content) == True:
                 #print(message.author.top_role.id)
                 #print('Deleting pleb')
-                await self.bot.delete_message(message)
-                await self.bot.send_message(self.bot.get_channel('141020464028844033'), '```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
+                await message.delete()
+                await self.bot.get_channel(141020464028844033).send('```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
                   
+    @commands.Cog.listener()
     async def on_message_edit(self, before, after): #Listen to message edits
-        if after.server.id == '98609319519453184': #Only listen to Manechat
-          if after.author.id != '349942347905236992': #Ignore yourself
+        if after.guild.id == 98609319519453184: #Only listen to Manechat
+          if after.author.id != 349942347905236992: #Ignore yourself
             if after.author.top_role.id != modrole: #Ignore mods
               if revfilter(after.content) == True:
                 #print(after.author.top_role.id)
                 #print('Deleting pleb')
-                await self.bot.delete_message(after)
-                await self.bot.send_message(self.bot.get_channel('141020464028844033'), '```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
+                await after.delete()
+                await self.bot.get_channel(141020464028844033).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
               
     # No createWhitelist because we can't create a whitelist without category and value
     
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def getTemplates(self): #Returns all templates
+    @commands.has_any_role(*Whitelist)
+    async def getTemplates(self, ctx): #Returns all templates
         if QueryCC('parser', 'template') == False:
-            await self.bot.say('```'+'No templates.```')
+            await ctx.send('```'+'No templates.```')
         else:
             Templates = QueryCC('parser', 'template')
             templates = [Template['value'] for Template in Templates]
             for template in Templates:
-                await self.bot.say('```'+template['name']+':'+template['value']+'```')
+                await ctx.send('```'+template['name']+':'+template['value']+'```')
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def getExceptions(self): #Returns all Exceptions
+    @commands.has_any_role(*Whitelist)
+    async def getExceptions(self, ctx): #Returns all Exceptions
         if QueryCC('parser', 'exception') == False:
-            await self.bot.say('```'+'No exceptions.```')
+            await ctx.send('```'+'No exceptions.```')
         else:
             Templates = QueryCC('parser', 'template')
             templates = [Template['name'] for Template in Templates]
@@ -105,56 +108,56 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
                 if idx+1 <= len(templates):
                     constring += '\n'
             constring += '```'
-            await self.bot.say(constring)
+            await ctx.send(constring)
 
     @commands.group()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def deleteWhitelist(self, name : str):
+    @commands.has_any_role(*Whitelist)
+    async def deleteWhitelist(self, ctx, name : str):
         if RemoveCN('parser', name):
-          await self.bot.say('```'+'Deleted '+name+' from Whitelists.```')
+          await ctx.send('```'+'Deleted '+name+' from Whitelists.```')
           return True
-        await self.bot.say('```'+name+' not in Whitelists.'+'```')
+        await ctx.send('```'+name+' not in Whitelists.'+'```')
         return False
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def addTemplate(self, name : str, template : str, ):
+    @commands.has_any_role(*Whitelist)
+    async def addTemplate(self, ctx, name : str, template : str, ):
         """        
         This function accepts flags, like IGNORECASE. This should be known and decided at this point for eachcase.
         The starting r'( and the finishing )' must be added by us. The special characters inside template, if any, don't need escaping.
         """
         if Insert({'cog': 'parser', 'name': name, 'category': 'template', 'value': template}): 
-          await self.bot.say('```'+'Added '+template+' to '+name+'.```')
+          await ctx.send('```'+'Added '+template+' to '+name+'.```')
           return True
         else: 
-          await self.bot.say('```'+'Unable to add template: '+template+'.```')
+          await ctx.send('```'+'Unable to add template: '+template+'.```')
           return False #Failed to insert.
 
     # No removeTemplate because a whitelist with no template would break revfilter very badly.
         
     @commands.group()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def addException(self, name : str, exception : str):
+    @commands.has_any_role(*Whitelist)
+    async def addException(self, ctx, name : str, exception : str):
         if QueryCN('parser', name) == False:
             #Can't add to non-existent whitelist
-            await self.bot.say('```'+'Unable to add exception: '+exception+' because whitelist does not exist.```')
+            await ctx.send('```'+'Unable to add exception: '+exception+' because whitelist does not exist.```')
         else: 
             expression = exception # TO-DO: Coded like this it only allows cases where the significant term is after the template, not before or inside.
             if Insert({'cog': 'parser', 'name': name, 'category': 'exception', 'value': expression}): # TO-DO does this insertion actually work?
-                await self.bot.say('```'+'Added '+exception+' to '+name+'.```')
+                await ctx.send('```'+'Added '+exception+' to '+name+'.```')
                 return True
-            await self.bot.say('```'+'Unable to add exception: '+exception+'.```')
+            await ctx.send('```'+'Unable to add exception: '+exception+'.```')
             return False 
         
 
     @commands.group()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def deleteException(self, name : str, exception : str):
+    @commands.has_any_role(*Whitelist)
+    async def deleteException(self, ctx, name : str, exception : str):
         expression = exception # TO-DO: Coded like this it only allows cases where the significant term is after the template, not before or inside.
         if RemoveCNCV('parser', name, 'exception', expression):
-          await self.bot.say('```'+'Deleted '+exception+' from '+name+'.```')
+          await ctx.send('```'+'Deleted '+exception+' from '+name+'.```')
           return True
-        await self.bot.say('```'+'Unable to delete '+exception+' from '+name+'.```')
+        await ctx.send('```'+'Unable to delete '+exception+' from '+name+'.```')
         return False
 
 def setup(bot):

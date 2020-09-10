@@ -3,6 +3,7 @@ from discord.ext import commands
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from pathlib import Path
+from config import *
 
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 
@@ -18,11 +19,11 @@ class Banlog(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.has_any_role('Cool Squad','Admin','Mods', 'Pinkie Pie')
-    async def banlog(self, userID : str):
+    @commands.has_any_role(*Whitelist)
+    async def banlog(self, ctx, userID : str):
         print(userID)
         if len(userID) <= 18 and userID.isdigit() == False:
-            await self.bot.say('```Invalid input.```')
+            await ctx.send('```Invalid input.```')
             raise ValueError('Invalid input')
         credentials = ServiceAccountCredentials.from_json_keyfile_name(dbdir, scope)
         gc = gspread.authorize(credentials)
@@ -30,7 +31,7 @@ class Banlog(commands.Cog):
         wks = wks.worksheet("Form Responses 1")
         results = (wks.findall(userID))
         if len(results) == 0:
-            await self.bot.say('```No results returned for user.```')
+            await ctx.send('```No results returned for user.```')
             raise IndexError('Length of results is 0.')
         userRow = list(reversed(results))[0].row
         userCol = list(reversed(results))[0].col
@@ -45,7 +46,7 @@ class Banlog(commands.Cog):
                 silences = silences+1
             elif title == "Ban":
                 bans = bans+1
-        await self.bot.say('``` ['+uname+'] Warnings: '+str(warnings)+' Silences: '+str(silences)+' Bans: '+str(bans)+'```')
+        await ctx.send('``` ['+uname+'] Warnings: '+str(warnings)+' Silences: '+str(silences)+' Bans: '+str(bans)+'```')
         warnings = silences = bans = 0
         for case in reversed(results):
             if (case.col==4) or (case.col==10) or (case.col==17):
@@ -72,11 +73,11 @@ class Banlog(commands.Cog):
                 #print(duration+" "+addinfo)
                 #print("------------------------------------")
                 if title == "Warning":
-                    await self.bot.say('['+title+'] '+date+' - '+offense+' | '+addinfo)
+                    await ctx.send('['+title+'] '+date+' - '+offense+' | '+addinfo)
                 else:
-                    await self.bot.say('['+title+'] ('+duration+') '+date+' - '+offense+' | '+addinfo)
+                    await ctx.send('['+title+'] ('+duration+') '+date+' - '+offense+' | '+addinfo)
             else:
-                await self.bot.say('```Invalid input.```')
+                await ctx.send('```Invalid input.```')
                 break
 
 def setup(bot):
