@@ -1,6 +1,6 @@
 # Opalescence 🐱
 
-Opalescence is a niche-purpose Discord bot written in Python using [discord.py](https://github.com/Rapptz/discord.py) (async branch)
+Opalescence is a niche-purpose Discord bot written in Python using [discord.py](https://github.com/Rapptz/discord.py)
 For the most part, it is largely just a way for me to learn how to do things in Python during my free time. 
 
 ### Bot code structure
@@ -11,7 +11,7 @@ For the most part, it is largely just a way for me to learn how to do things in 
 * All useful functionality of the bot is available as individual scripts inside the cogs directory. 
 
 ### Requirements
-    discord.py 0.16.12
+    discord.py 1.4.1
     gspread
     oauth2client
     tinydb
