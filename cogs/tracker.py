@@ -93,7 +93,7 @@ class Tracker(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         if member.guild.id == 98609319519453184:
-            await self.bot.get_channel(349945916779921408).send(member.name+' ('+member.id+') left the server.')
+            await self.bot.get_channel(349945916779921408).send(member.name+' ('+str(member.id)+') left the server.')
     
 def setup(bot):
     bot.add_cog(Tracker(bot))

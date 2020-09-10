@@ -6,7 +6,7 @@ sys.path.append('..')
 from config import *
 import asyncio
 import random
-import datetime
+from datetime import datetime
 import re
 import subprocess
 from pathlib import Path
