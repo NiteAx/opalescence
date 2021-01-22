@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 
 #Joinrole related
-roles=['683620628682899466','683620633891962957','683620640141344769','683620646634127383','683620652686508084','683620659385073717']
+roles=[802170446250115073,802170728538570792,802170902896705536,802171084610076673,802174521993199626,802174717611212870,802174908464496690]
 responses=["I just don't know what went wrong! <a:derp:554593471089082378>", "Oops, my bad! <:derpysad:587780328765259776>", "All done! <a:derpysmile:399726352758079498>", "Want a complimentary muffin? <a:derpysmile:399726352758079498>" , "Break time!"]
 breaktime=[" <:derpystop:585590699307696159>", " <:derpysleep:588652359450886154>", " <a:derpywave:585560131140452389>"]
 
@@ -38,10 +38,7 @@ class Basic(commands.Cog):
         chanName = chanName.split('#').pop()
         if chanName.endswith('>'):
             chanName = chanName.split('>')[0]
-            chan = discord.utils.get(ctx.message.guild.channels, id=chanName)
-        else:
-            chan = discord.utils.get(ctx.message.guild.channels, name=chanName)
-        await chan.send(message)
+        await self.bot.get_channel(chanName).send(message)
     
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -82,8 +79,8 @@ class Basic(commands.Cog):
     
     @commands.command(pass_context=True)
     async def joinrole(self, ctx):
-        chosenrole = discord.utils.get(ctx.message.guild.roles, id=random.choice(roles))
-        #print('Random Role: '+chosenrole.name+' '+str(chosenrole.id))
+        chosenrole = ctx.message.guild.get_role(random.choice(roles))
+        print('Random Role: '+chosenrole.name+' '+str(chosenrole.id))
         user = ctx.message.author
         memberoles = []
         for role in user.roles:
@@ -92,15 +89,6 @@ class Basic(commands.Cog):
         #print(memberoles)
         if set(roles).isdisjoint(set(memberoles)):
             await user.add_roles(chosenrole)
-            response = random.choice(responses)
-            if response == "Break time!":
-                await user.remove_roles(chosenrole)
-                await ctx.send(response+random.choice(breaktime))
-            else:
-                await ctx.send(response)
-            #print('Assigning role....')
-        #else:
-            #print('User already has role from list.')
     
     @commands.command()
     @commands.has_any_role(*Whitelist)
