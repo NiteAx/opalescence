@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 from discord.utils import get
 import sys
@@ -10,12 +10,16 @@ from datetime import datetime
 import re
 import subprocess
 from pathlib import Path
+import io
+import aiohttp
+from itertools import cycle
 
 #Joinrole related
 roles=[802170446250115073,802170728538570792,802170902896705536,802171084610076673,802174521993199626,802174717611212870,802174908464496690]
 responses=["I just don't know what went wrong! <a:derp:554593471089082378>", "Oops, my bad! <:derpysad:587780328765259776>", "All done! <a:derpysmile:399726352758079498>", "Want a complimentary muffin? <a:derpysmile:399726352758079498>" , "Break time!"]
 breaktime=[" <:derpystop:585590699307696159>", " <:derpysleep:588652359450886154>", " <a:derpywave:585560131140452389>"]
-
+bannerbucket = []
+guild_id = 98609319519453184
 repodir = Path('../manechat.github.io')
 indexdir = str(repodir / 'invite.txt')
 repodir = str(repodir)
@@ -24,6 +28,7 @@ pingtime = 60
 class Basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.set_random_banner.start()
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -166,5 +171,56 @@ class Basic(commands.Cog):
             print('Mistmatch between repo and current server invite.')
             await ctx.send('```Mistmatch between repo and current server invite.```')
         
+    @commands.command()
+    @commands.has_any_role(*Whitelist)
+    async def setbanner(self, ctx, url:str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                if resp.status != 200:
+                    return await ctx.send("```Problem downloading file.```")
+                data = io.BytesIO(await resp.read())
+                await ctx.message.guild.edit(banner=data.read())
+                await ctx.send("```Banner set.```")
+                
+    @commands.command()
+    @commands.has_any_role(*Whitelist)
+    async def addbanner(self, ctx, url:str):
+        bannerbucket.append(url)
+        bannerlist = "```Banner URLs:\n"
+        for x in bannerbucket:
+            bannerlist += x+'\n'
+        bannerlist += "```"
+        #print(bannerlist)
+        await ctx.send(bannerlist)
+        
+    @commands.command()
+    @commands.has_any_role(*Whitelist)
+    async def listbanner(self, ctx):
+        bannerlist = "```Banner URLs:\n"
+        for x in bannerbucket:
+            bannerlist += x+'\n'
+        bannerlist += "```"
+        #print(bannerlist)
+        await ctx.send(bannerlist)
+        
+    @commands.command()
+    @commands.has_any_role(*Whitelist)
+    async def clearbanner(self, ctx):
+        bannerbucket.clear()
+        await ctx.send("```Banners cleared.```")
+        
+    @tasks.loop(hours=1.0)
+    async def set_random_banner(self):
+        guild = self.bot.get_guild(guild_id)
+        if len(bannerbucket) > 0:
+            url = random.choice(bannerbucket)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    if resp.status != 200:
+                        print("Problem downloading file.")
+                    data = io.BytesIO(await resp.read())
+                    await guild.edit(banner=data.read())
+                    print("Banner set to "+url)
+    
 def setup(bot):
     bot.add_cog(Basic(bot))
