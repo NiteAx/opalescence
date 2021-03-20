@@ -29,6 +29,7 @@ class Basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.set_random_banner.start()
+        self.currently_selected = None
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -202,7 +203,15 @@ class Basic(commands.Cog):
         bannerlist += "```"
         #print(bannerlist)
         await ctx.send(bannerlist)
-        
+
+    # Opened to normal users
+    @commands.command()
+    async def banner(self, ctx):
+        bannermsg = "```Banner currently in use:\n%s\n```" % (
+            self.currently_selected
+        )
+        await ctx.send(bannermsg)
+
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def clearbanner(self, ctx):
@@ -214,6 +223,7 @@ class Basic(commands.Cog):
         guild = self.bot.get_guild(guild_id)
         if len(bannerbucket) > 0:
             url = random.choice(bannerbucket)
+            self.currently_selected = url
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     if resp.status != 200:
