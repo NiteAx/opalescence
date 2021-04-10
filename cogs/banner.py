@@ -9,6 +9,7 @@ sys.path.append('..')
 from config import *
 
 current_banner = ""
+bannertimer = 60
 
 class Banner(commands.Cog):
     def __init__(self, bot):
@@ -42,15 +43,21 @@ class Banner(commands.Cog):
             f.close
 
     @commands.command()
+    @commands.has_any_role(*Whitelist)
+    async def bannertimer(self, ctx, time:int):
+        global bannertimer
+        bannertimer = time
+
+    @commands.command()
     async def banner(self, ctx):
         global current_banner
         #print(current_banner)
         if len(current_banner) > 0:
             await ctx.send(str(current_banner))
         else:
-            await ctx.send(str("Banner not currently set."))
+            await ctx.send(str("```Banner not currently set.```"))
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(seconds=bannertimer)
     async def set_random_banner(self):
         global current_banner
         guild = self.bot.get_guild(guild_id)
