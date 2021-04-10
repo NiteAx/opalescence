@@ -1,4 +1,4 @@
-from discord.ext import commands, tasks
+from discord.ext import commands
 import discord
 from discord.utils import get
 import sys
@@ -10,16 +10,11 @@ from datetime import datetime
 import re
 import subprocess
 from pathlib import Path
-import io
-import aiohttp
-from itertools import cycle
 
 #Joinrole related
 roles=[802170446250115073,802170728538570792,802170902896705536,802171084610076673,802174521993199626,802174717611212870,802174908464496690]
 responses=["I just don't know what went wrong! <a:derp:554593471089082378>", "Oops, my bad! <:derpysad:587780328765259776>", "All done! <a:derpysmile:399726352758079498>", "Want a complimentary muffin? <a:derpysmile:399726352758079498>" , "Break time!"]
 breaktime=[" <:derpystop:585590699307696159>", " <:derpysleep:588652359450886154>", " <a:derpywave:585560131140452389>"]
-bannerbucket = []
-guild_id = 98609319519453184
 repodir = Path('../manechat.github.io')
 indexdir = str(repodir / 'invite.txt')
 repodir = str(repodir)
@@ -28,15 +23,13 @@ pingtime = 60
 class Basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.set_random_banner.start()
-        self.currently_selected = None
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def add(self, ctx, left : int, right : int):
         """Adds two numbers together."""
         await ctx.send(left + right)
-    
+
     #bad channel parsing
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -45,12 +38,12 @@ class Basic(commands.Cog):
         if chanName.endswith('>'):
             chanName = chanName.split('>')[0]
         await self.bot.get_channel(chanName).send(message)
-    
+
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def echomc(self, ctx, *, message: str):
         await self.bot.get_channel(98609319519453184).send(message)
-    
+
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def repeat(self, ctx, times : int, content : str):
@@ -60,13 +53,13 @@ class Basic(commands.Cog):
                 await ctx.send(content)
         else:
             await ctx.send("Please don't get me banned by Discord! (Max 5)")
-    
+
     @commands.command(pass_context=True)
     @commands.has_any_role(*Whitelist)
     async def roleid(self, ctx, *, rolename : str):
         roles = ctx.message.guild.roles
         for role in (y for y in roles if y.name.lower() == rolename.lower()):
-            print(role.name+': '+str(role.id)) 
+            print(role.name+': '+str(role.id))
             await ctx.send('```'+role.name+': '+str(role.id)+'```')
 
     @commands.command(pass_context=True)
@@ -75,14 +68,14 @@ class Basic(commands.Cog):
         roles = ctx.message.guild.roles
         for role in (y for y in roles if y.name != '@everyone'):
             print(role.name +' '+ str(role.id))
-    
+
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def remindme(self, ctx, time : int, reminder : str):
         await ctx.send('```Reminder set for '+str(time)+' seconds from now.```')
         await asyncio.sleep(time)
         await ctx.send(reminder)
-    
+
     @commands.command(pass_context=True)
     async def joinrole(self, ctx):
         chosenrole = ctx.message.guild.get_role(random.choice(roles))
@@ -95,7 +88,7 @@ class Basic(commands.Cog):
         #print(memberoles)
         if set(roles).isdisjoint(set(memberoles)):
             await user.add_roles(chosenrole)
-    
+
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def stowaways(self, ctx):
@@ -111,7 +104,7 @@ class Basic(commands.Cog):
             await ctx.send("Hull's clear, cap'n.")
         else:
             await ctx.send(stowaways)
-    
+
     @commands.command(pass_context=True)
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.user)
     async def ping(self, ctx, *, role : str):
@@ -139,7 +132,7 @@ class Basic(commands.Cog):
                 await asyncio.sleep(5)
                 #await ctx.message.delete()
                 #await notwhitelisted.delete()
-                
+
     @commands.command(pass_context=True)
     @commands.has_any_role(*Whitelist)
     async def rotate(self, ctx):
@@ -154,12 +147,12 @@ class Basic(commands.Cog):
         print('discord_invitecode = '+discord_invitecode)
         try:
             invite = await self.bot.fetch_invite(discord_inviteURL)
-            await invite.delete() #await delete invite 
+            await invite.delete() #await delete invite
             message = await ctx.send('```Rotating invite...```')
             invite = await self.bot.get_channel(648943910013501448).create_invite(max_age=0, unique=True) #create new invite
             new_invitetxt = invitetxt.replace(discord_invitecode, invite.code)
             with open(indexdir, 'w') as file: #replace invite index.html
-                file.write(new_invitetxt)   
+                file.write(new_invitetxt)
             #git push to remote
             print('----Adding changes')
             subprocess.call(["git", "-C", repodir, "add", "-u",])
@@ -171,66 +164,6 @@ class Basic(commands.Cog):
         except:
             print('Mistmatch between repo and current server invite.')
             await ctx.send('```Mistmatch between repo and current server invite.```')
-        
-    @commands.command()
-    @commands.has_any_role(*Whitelist)
-    async def setbanner(self, ctx, url:str):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                if resp.status != 200:
-                    return await ctx.send("```Problem downloading file.```")
-                data = io.BytesIO(await resp.read())
-                await ctx.message.guild.edit(banner=data.read())
-                await ctx.send("```Banner set.```")
-                
-    @commands.command()
-    @commands.has_any_role(*Whitelist)
-    async def addbanner(self, ctx, url:str):
-        bannerbucket.append(url)
-        bannerlist = "```Banner URLs:\n"
-        for x in bannerbucket:
-            bannerlist += x+'\n'
-        bannerlist += "```"
-        #print(bannerlist)
-        await ctx.send(bannerlist)
-        
-    @commands.command()
-    @commands.has_any_role(*Whitelist)
-    async def listbanner(self, ctx):
-        bannerlist = "```Banner URLs:\n"
-        for x in bannerbucket:
-            bannerlist += x+'\n'
-        bannerlist += "```"
-        #print(bannerlist)
-        await ctx.send(bannerlist)
 
-    # Opened to normal users
-    @commands.command()
-    async def banner(self, ctx):
-        bannermsg = "```Banner currently in use:\n%s\n```" % (
-            self.currently_selected
-        )
-        await ctx.send(bannermsg)
-
-    @commands.command()
-    @commands.has_any_role(*Whitelist)
-    async def clearbanner(self, ctx):
-        bannerbucket.clear()
-        await ctx.send("```Banners cleared.```")
-        
-    @tasks.loop(hours=1.0)
-    async def set_random_banner(self):
-        guild = self.bot.get_guild(guild_id)
-        if len(bannerbucket) > 0:
-            url = random.choice(bannerbucket)
-            self.currently_selected = url
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as resp:
-                    if resp.status != 200:
-                        print("Problem downloading file.")
-                    data = io.BytesIO(await resp.read())
-                    await guild.edit(banner=data.read())
-                    print("Banner set to "+url)
-    
 def setup(bot):
     bot.add_cog(Basic(bot))
