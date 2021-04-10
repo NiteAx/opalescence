@@ -45,7 +45,10 @@ class Banner(commands.Cog):
     async def banner(self, ctx):
         global current_banner
         #print(current_banner)
-        await ctx.send(str(current_banner))
+        if len(current_banner) > 0:
+            await ctx.send(str(current_banner))
+        else:
+            await ctx.send(str("Banner not currently set."))
 
     @tasks.loop(seconds=60)
     async def set_random_banner(self):
