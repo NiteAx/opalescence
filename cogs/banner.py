@@ -9,7 +9,6 @@ sys.path.append('..')
 from config import *
 
 current_banner = ""
-bannertimer = 60
 
 class Banner(commands.Cog):
     def __init__(self, bot):
@@ -43,12 +42,6 @@ class Banner(commands.Cog):
             f.close
 
     @commands.command()
-    @commands.has_any_role(*Whitelist)
-    async def bannertimer(self, ctx, time:int):
-        global bannertimer
-        bannertimer = time
-
-    @commands.command()
     async def banner(self, ctx):
         global current_banner
         #print(current_banner)
@@ -57,20 +50,22 @@ class Banner(commands.Cog):
         else:
             await ctx.send(str("```Banner not currently set.```"))
 
-    @tasks.loop(seconds=bannertimer)
+    @tasks.loop(seconds=5)
     async def set_random_banner(self):
         global current_banner
         guild = self.bot.get_guild(guild_id)
         f = open ('bannerlist.txt', 'r')
         contents = f.read()
+        bannerlist = contents.splitlines(True)
         if len(contents) > 0:
-            bannerlist = contents.splitlines(True)
             #print(bannerlist)
             current_banner = random.choice([i for i in bannerlist if i != current_banner])
+            current_banner = current_banner.split('\n')[0]
+            print(current_banner)
             async with aiohttp.ClientSession() as session:
                 async with session.get(current_banner) as resp:
                     if resp.status != 200:
-                        print("Problem downloading file.")
+                        print("Problem downloading file: "+str(resp.status))
                     data = io.BytesIO(await resp.read())
                     await guild.edit(banner=data.read())
                     print("Banner set to "+current_banner)

@@ -69,12 +69,11 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
     async def on_message_edit(self, before, after): #Listen to message edits
         if after.guild.id == 98609319519453184: #Only listen to Manechat
           if after.author.id != 349942347905236992: #Ignore yourself
-            if after.author.top_role.id != modrole: #Ignore mods
-              if revfilter(after.content) == True:
-                #print(after.author.top_role.id)
-                #print('Deleting pleb')
-                await after.delete()
-                await self.bot.get_channel(141020464028844033).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
+            if revfilter(after.content) == True:
+              #print(after.author.top_role.id)
+              #print('Deleting pleb')
+              await after.delete()
+              await self.bot.get_channel(141020464028844033).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
               
     # No createWhitelist because we can't create a whitelist without category and value
     
