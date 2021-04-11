@@ -22,7 +22,7 @@ class Banner(commands.Cog):
             async with session.get(url) as resp:
                 print(str(resp.status))
         if resp.status != 200:
-            print(Problem getting file.)
+            print("Problem getting file."")
             await ctx.send("```Problem getting file.```")
         else:
             data = io.BytesIO(await resp.read())
