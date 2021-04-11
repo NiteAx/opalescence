@@ -18,13 +18,34 @@ class Banner(commands.Cog):
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def addbanner(self, ctx, url:str):
-        with open('bannerlist.txt', 'a+') as f:
-            f.write(url+"\n")
-            f.close
-        f = open ('bannerlist.txt', 'r')
-        contents = f.read()
-        print(contents)
-        await ctx.send("```Banner list:\n"+contents+"```")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                print(str(resp.status))
+        if resp.status != 200:
+            print(Problem getting file.)
+            await ctx.send("```Problem getting file.```")
+        else:
+            data = io.BytesIO(await resp.read())
+            await guild.edit(banner=data.read())
+            print("Banner set to "+current_banner)
+
+    @commands.command()
+    @commands.has_any_role(*Whitelist)
+    async def addbanner(self, ctx, url:str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                print(str(resp.status))
+        if resp.status != 200:
+            print(Problem getting file.)
+            await ctx.send("```Problem getting file.```")
+        else:
+            with open('bannerlist.txt', 'a+') as f:
+                f.write(url+"\n")
+                f.close
+            f = open ('bannerlist.txt', 'r')
+            contents = f.read()
+            print(contents)
+            await ctx.send("```Banner list:\n"+contents+"```")
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -66,9 +87,13 @@ class Banner(commands.Cog):
                 async with session.get(current_banner) as resp:
                     if resp.status != 200:
                         print("Problem downloading file: "+str(resp.status))
-                    data = io.BytesIO(await resp.read())
-                    await guild.edit(banner=data.read())
-                    print("Banner set to "+current_banner)
+                    else:
+                        try:
+                            data = io.BytesIO(await resp.read())
+                            await guild.edit(banner=data.read())
+                            print("Banner set to "+current_banner)
+                        except:
+                            print("Problem setting banner.")
 
     @set_random_banner.before_loop
     async def before_task(self):
