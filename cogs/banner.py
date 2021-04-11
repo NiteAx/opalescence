@@ -28,7 +28,7 @@ class Banner(commands.Cog):
                 else:
                     data = io.BytesIO(await resp.read())
                     await guild.edit(banner=data.read())
-                    print("Banner set to "+current_banner)
+                    print("Banner set to: "+url)
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -72,7 +72,7 @@ class Banner(commands.Cog):
         else:
             await ctx.send(str("```Banner not currently set.```"))
 
-    @tasks.loop(seconds=5)
+    @tasks.loop(seconds=60)
     async def set_random_banner(self):
         global current_banner
         guild = self.bot.get_guild(guild_id)
