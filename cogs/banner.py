@@ -18,6 +18,7 @@ class Banner(commands.Cog):
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def setbanner(self, ctx, url:str):
+        guild = self.bot.get_guild(guild_id)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 print(str(resp.status))
