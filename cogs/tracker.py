@@ -28,7 +28,7 @@ class Tracker(commands.Cog):
                 if len(message.content) == 0:   #If message has no text
                     msgcontent = message.content    #Message is empty
                 else:
-                    msgcontent = ':page_facing_up:: '+message.content   #Else, message has text    
+                    msgcontent = ':page_facing_up:: '+message.content   #Else, message has text
                 import random
                 r = lambda: random.randint(0,255)
                 colors = ('0x%02X%02X%02X' % (r(),r(),r()))
@@ -40,7 +40,7 @@ class Tracker(commands.Cog):
                             embedflag = 1
                         else:
                             embed.set_image(url=message.attachments[0].proxy_url)
-                            embedflag = 1         
+                            embedflag = 1
                 except: #If message has no attachment, search message for key strings and attach link to embed
                     if '.png' in message.content:
                         s = message.content
@@ -71,29 +71,38 @@ class Tracker(commands.Cog):
                 if embedflag == 1: #If we have created an embed (message had image), post to #sweetielog
                     identifier = '<@'+str(message.author.id)+'>'
                     deletetime = str(datetime.utcnow()).split('.')[0]+' UTC'
-                    embed.set_footer(text=deletetime+' '+identifier)        
+                    embed.set_footer(text=deletetime+' '+identifier)
                     await self.bot.get_channel(141020464028844033).send(embed=embed)
                 else: #If we don't have an embed (message contains no image), post to test server logging channel
                     await self.bot.get_channel(349945916779921408).send('['+(str(message.created_at)).split('.')[0]+' UTC] #'+message.channel.name+' '+message.author.name+' ('+str(message.author.id)+')'+' : '+message.content)
-    
+
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         if reaction.custom_emoji == True:
-            print('['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji.name)
+            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji.name
+            print(message)
+            await self.bot.get_channel(349945916779921408).send(message)
         else:
-            print('['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji)
-    
+            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji
+            print(message)
+            await self.bot.get_channel(349945916779921408).send(message)
+
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
         if reaction.custom_emoji == True:
-            print('['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji.name)
+            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji.name
+            print(message)
+            await self.bot.get_channel(349945916779921408).send(message)
         else:
-            print('['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji)
-    
+            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji
+            print(message)
+            await self.bot.get_channel(349945916779921408).send(message)
+
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         if member.guild.id == 98609319519453184:
-            await self.bot.get_channel(349945916779921408).send(member.name+' ('+str(member.id)+') left the server.')
-    
+            message = member.name+' ('+str(member.id)+') left the server.'
+            await self.bot.get_channel(349945916779921408).send(message)
+
 def setup(bot):
     bot.add_cog(Tracker(bot))

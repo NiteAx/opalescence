@@ -8,7 +8,9 @@ import sys
 sys.path.append('..')
 from config import *
 
-bot = commands.Bot(command_prefix='?')
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix='?', intents=intents)
 
 cogs_dir = "cogs"
 
@@ -19,7 +21,7 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     bot.loop.create_task(status_task())
-    
+
 @bot.command()
 @commands.has_any_role(*Whitelist)
 async def load(ctx, extension_name : str):
@@ -30,7 +32,7 @@ async def load(ctx, extension_name : str):
         await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
         return
     await ctx.send("{} loaded.".format(extension_name))
-    
+
 @bot.command()
 @commands.has_any_role(*Whitelist)
 async def unload(ctx, extension_name : str):
@@ -41,7 +43,7 @@ async def unload(ctx, extension_name : str):
     """Unloads an extension."""
     bot.unload_extension(extension_name)
     await ctx.send("{} unloaded.".format(extension_name))
-    
+
 @bot.command()
 @commands.has_any_role(*Whitelist)
 async def reload(ctx, extension_name : str):
@@ -58,14 +60,14 @@ async def reload(ctx, extension_name : str):
         await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
         return
     await ctx.send("{} reloaded.".format(extension_name))
-    
+
 async def status_task():
     while True:
         manechat = bot.get_guild(98609319519453184)
         status1 = discord.Game('with '+str(manechat.member_count)+' ponies')
         await bot.change_presence(activity=status1)
         await asyncio.sleep(10)
-    
+
 if __name__ == "__main__":
     extensionss = []
     for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
@@ -80,5 +82,5 @@ if __name__ == "__main__":
                 print('Failed to load extension {extension}.'.format(extension))
                 traceback.print_exc()
     print("Loaded: "+(' '.join(extensionss)))
-    
+
 bot.run(token)
