@@ -21,13 +21,13 @@ class Banner(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 print(str(resp.status))
-        if resp.status != 200:
-            print("Problem getting file.")
-            await ctx.send("```Problem getting file.```")
-        else:
-            data = io.BytesIO(await resp.read())
-            await guild.edit(banner=data.read())
-            print("Banner set to "+current_banner)
+                if resp.status != 200:
+                    print("Problem getting file.")
+                    await ctx.send("```Problem getting file.```")
+                else:
+                    data = io.BytesIO(await resp.read())
+                    await guild.edit(banner=data.read())
+                    print("Banner set to "+current_banner)
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -35,17 +35,17 @@ class Banner(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 print(str(resp.status))
-        if resp.status != 200:
-            print("Problem getting file.")
-            await ctx.send("```Problem getting file.```")
-        else:
-            with open('bannerlist.txt', 'a+') as f:
-                f.write(url+"\n")
-                f.close
-            f = open ('bannerlist.txt', 'r')
-            contents = f.read()
-            print(contents)
-            await ctx.send("```Banner list:\n"+contents+"```")
+                if resp.status != 200:
+                    print("Problem getting file.")
+                    await ctx.send("```Problem getting file.```")
+                else:
+                    with open('bannerlist.txt', 'a+') as f:
+                        f.write(url+"\n")
+                        f.close
+                    f = open ('bannerlist.txt', 'r')
+                    contents = f.read()
+                    print(contents)
+                    await ctx.send("```Banner list:\n"+contents+"```")
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
