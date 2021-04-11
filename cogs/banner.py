@@ -17,7 +17,7 @@ class Banner(commands.Cog):
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
-    async def addbanner(self, ctx, url:str):
+    async def setbanner(self, ctx, url:str):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 print(str(resp.status))
@@ -36,7 +36,7 @@ class Banner(commands.Cog):
             async with session.get(url) as resp:
                 print(str(resp.status))
         if resp.status != 200:
-            print("Problem getting file."")
+            print("Problem getting file.")
             await ctx.send("```Problem getting file.```")
         else:
             with open('bannerlist.txt', 'a+') as f:
