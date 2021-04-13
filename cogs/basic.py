@@ -167,7 +167,7 @@ class Basic(commands.Cog):
     
     @commands.command()
     async def feedback(self, ctx):
-        await ctx.author.send("0. At the end of the day, the users are the most important part of our server. Your thoughts and opinions have a lot of weight in our moderation of the server, no matter how small or personal you think the problem is, but most of the time we only get to hear ours. There are several ways you can get in touch and provide feedback and concerns about the server:\n1) The Feeling Form, which is shared with all mods. Please include your username if you want a response: https://bit.ly/3df0krH \n2) Post in #metachat\n3) Direct Message one of the mods\n4) Request Luna's guest to have a real time chat with all the mods at once.")
+        await ctx.author.send("0. At the end of the day, the users are the most important part of our server. Your thoughts and opinions have a lot of weight in our moderation of the server, no matter how small or personal you think the problem is, but most of the time we only get to hear ours. There are several ways you can get in touch and provide feedback and concerns about the server:\na. The Feeling Form, which is shared with all mods. Please include your username if you want a response: https://bit.ly/3df0krH \nb. Post in #metachat\nc. Direct Message one of the mods\nd. Request Luna's guest to have a real time chat with all the mods at once.")
 
 def setup(bot):
     bot.add_cog(Basic(bot))
