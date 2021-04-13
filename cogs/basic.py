@@ -164,6 +164,10 @@ class Basic(commands.Cog):
         except:
             print('Mistmatch between repo and current server invite.')
             await ctx.send('```Mistmatch between repo and current server invite.```')
+    
+    @commands.command()
+    async def feedback(self, ctx):
+        await ctx.author.send("Feedback!")
 
 def setup(bot):
     bot.add_cog(Basic(bot))
