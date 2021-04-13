@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 import asyncio
 import re
@@ -56,24 +57,30 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
 
     @commands.Cog.listener()
     async def on_message(self, message): #Listen to messages
-        if message.guild.id == 98609319519453184: #Only listen to Manechat
-          if message.author.id != 349942347905236992: #Ignore yourself
-            if message.author.top_role.id != modrole: #Ignore mods
-              if revfilter(message.content) == True:
-                #print(message.author.top_role.id)
-                #print('Deleting pleb')
-                await message.delete()
-                await self.bot.get_channel(141020464028844033).send('```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
+        if message.author.id != 349942347905236992: #Ignore yourself
+          if isinstance(message.channel, discord.channel.DMChannel):
+              print(message.author.name+": "+message.content)
+          else:
+              if message.guild.id == guild_id: #Only listen to Manechat
+                if message.author.top_role.id != modrole: #Ignore mods
+                  if revfilter(message.content) == True:
+                    #print(message.author.top_role.id)
+                    #print('Deleting pleb')
+                    await message.delete()
+                    await self.bot.get_channel(image_channel).send('```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
                   
     @commands.Cog.listener()
     async def on_message_edit(self, before, after): #Listen to message edits
-        if after.guild.id == 98609319519453184: #Only listen to Manechat
-          if after.author.id != 349942347905236992: #Ignore yourself
-            if revfilter(after.content) == True:
-              #print(after.author.top_role.id)
-              #print('Deleting pleb')
-              await after.delete()
-              await self.bot.get_channel(141020464028844033).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
+        if after.author.id != 349942347905236992: #Ignore yourself
+          if isinstance(after.channel, discord.channel.DMChannel):
+              print(after.author.name+": "+before.content+" --> "+after.content)
+          else:
+            if after.guild.id == guild_id: #Only listen to Manechat
+              if revfilter(after.content) == True:
+                #print(after.author.top_role.id)
+                #print('Deleting pleb')
+                await after.delete()
+                await self.bot.get_channel(image_channel).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
               
     # No createWhitelist because we can't create a whitelist without category and value
     
