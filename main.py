@@ -10,6 +10,11 @@ from config import *
 
 intents = discord.Intents.default()
 intents.members = True
+intents.guilds = True
+intents.members = True
+intents.presences = True
+intents.guild_messages = True
+intents.guild_reactions = True
 bot = commands.Bot(command_prefix='?', intents=intents)
 
 cogs_dir = "cogs"
@@ -80,7 +85,6 @@ if __name__ == "__main__":
                 bot.load_extension(cogs_dir + "." + extension)
             except Exception as e:
                 print('Failed to load extension {extension}.'.format(extension))
-                traceback.print_exc()
     print("Loaded: "+(' '.join(extensionss)))
 
 bot.run(token)
