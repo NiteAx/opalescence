@@ -11,7 +11,7 @@ import re
 import subprocess
 from pathlib import Path
 
-#Joinrole related
+#Joinrole related 
 roles=[802170446250115073,802170728538570792,802170902896705536,802171084610076673,802174521993199626,802174717611212870,802174908464496690]
 responses=["I just don't know what went wrong! <a:derp:554593471089082378>", "Oops, my bad! <:derpysad:587780328765259776>", "All done! <a:derpysmile:399726352758079498>", "Want a complimentary muffin? <a:derpysmile:399726352758079498>" , "Break time!"]
 breaktime=[" <:derpystop:585590699307696159>", " <:derpysleep:588652359450886154>", " <a:derpywave:585560131140452389>"]
