@@ -11,7 +11,7 @@ import re
 import subprocess
 from pathlib import Path
 
-#Joinrole related 
+#Joinrole related
 roles=[802170446250115073,802170728538570792,802170902896705536,802171084610076673,802174521993199626,802174717611212870,802174908464496690]
 responses=["I just don't know what went wrong! <a:derp:554593471089082378>", "Oops, my bad! <:derpysad:587780328765259776>", "All done! <a:derpysmile:399726352758079498>", "Want a complimentary muffin? <a:derpysmile:399726352758079498>" , "Break time!"]
 breaktime=[" <:derpystop:585590699307696159>", " <:derpysleep:588652359450886154>", " <a:derpywave:585560131140452389>"]
@@ -34,9 +34,7 @@ class Basic(commands.Cog):
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def echo(self, ctx, chanName : str, *, message: str):
-        chanName = chanName.split('#').pop()
-        if chanName.endswith('>'):
-            chanName = chanName.split('>')[0]
+        chanName = int(chanName.split("#")[1].split(">")[0])
         await self.bot.get_channel(chanName).send(message)
 
     @commands.command()
@@ -167,7 +165,7 @@ class Basic(commands.Cog):
     
     @commands.command()
     async def feedback(self, ctx):
-        await ctx.author.send("0. At the end of the day, the users are the most important part of our server. Your thoughts and opinions have a lot of weight in our moderation of the server, no matter how small or personal you think the problem is, but most of the time we only get to hear ours. There are several ways you can get in touch and provide feedback and concerns about the server:\na. The Feeling Form, which is shared with all mods. Please include your username if you want a response: https://bit.ly/3df0krH \nb. Post in <#819365738543710258>\nc. Direct Message one of the mods\nd. Request Luna's guest to have a real time chat with all the mods at once.")
+        await ctx.author.send("0. At the end of the day, the users are the most important part of our server. Your thoughts and opinions have a lot of weight in our moderation of the server, no matter how small or personal you think the problem is, but most of the time we only get to hear ours. There are several ways you can get in touch and provide feedback and concerns about the server:\na. The Feeling Form (https://forms.gle/9ZQ8veUsJ7JyFr3R8) is private, goes directly to all mods and can be anonymous. But if you sign it, we will always get back to you with a response.\nb. Post in <#819365738543710258>\nc. Direct Message one of the mods\nd. Request Luna's guest to have a real time chat with all the mods at once, alone or accompanied.")
 
 def setup(bot):
     bot.add_cog(Basic(bot))
