@@ -18,7 +18,6 @@ breaktime=[" <:derpystop:585590699307696159>", " <:derpysleep:588652359450886154
 repodir = Path('../manechat.github.io')
 indexdir = str(repodir / 'invite.txt')
 repodir = str(repodir)
-pingtime = 60
 
 class Basic(commands.Cog):
     def __init__(self, bot):
@@ -51,21 +50,6 @@ class Basic(commands.Cog):
                 await ctx.send(content)
         else:
             await ctx.send("Please don't get me banned by Discord! (Max 5)")
-
-    @commands.command(pass_context=True)
-    @commands.has_any_role(*Whitelist)
-    async def roleid(self, ctx, *, rolename : str):
-        roles = ctx.message.guild.roles
-        for role in (y for y in roles if y.name.lower() == rolename.lower()):
-            print(role.name+': '+str(role.id))
-            await ctx.send('```'+role.name+': '+str(role.id)+'```')
-
-    @commands.command(pass_context=True)
-    @commands.has_any_role(*Whitelist)
-    async def listroles(self, ctx):
-        roles = ctx.message.guild.roles
-        for role in (y for y in roles if y.name != '@everyone'):
-            print(role.name +' '+ str(role.id))
 
     @commands.command()
     @commands.has_any_role(*Whitelist)
@@ -102,34 +86,6 @@ class Basic(commands.Cog):
             await ctx.send("Hull's clear, cap'n.")
         else:
             await ctx.send(stowaways)
-
-    @commands.command(pass_context=True)
-    @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.user)
-    async def ping(self, ctx, *, role : str):
-        if ctx.message.author.top_role.name == 'Mods':
-                    ctx.command.reset_cooldown(ctx)
-        if ctx.message.author.top_role.id != newprole: #ignore newp
-            if any(pingrole.lower() == role.lower() for pingrole in pingwhitelist):
-                print('['+(str(datetime.now())).split('.')[0]+' UTC] '+ctx.message.author.name+' used ?ping '+role)
-                roles = ctx.message.guild.roles
-                roles = [r.name for r in roles]
-                for r in (y for y in roles if y.lower() == role.lower()):
-                    pingrole = r
-                r = pingrole
-                pingrole = discord.utils.get(ctx.message.guild.roles, name=r)
-                await pingrole.edit(mentionable=True)
-                nowpingable = await ctx.send('```'+r+' is now pingable for '+str(pingtime)+' seconds.```')
-                await asyncio.sleep(pingtime)
-                await pingrole.edit(mentionable=False)
-                #await ctx.message.delete()
-                #await nowpingable.delete()
-            else:
-                print(ctx.message.author.name+' failed to use ?ping '+role+' at '+str(datetime.datetime.now()))
-                notwhitelisted = await ctx.send('```'+role+' is not whitelisted.```')
-                ctx.command.reset_cooldown(ctx)
-                await asyncio.sleep(5)
-                #await ctx.message.delete()
-                #await notwhitelisted.delete()
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*Whitelist)
