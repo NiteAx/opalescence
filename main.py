@@ -10,9 +10,6 @@ from os.path import isfile, join
 import sys
 import ast
 
-sys.path.append('..')
-from config import othertoken
-
 cogs_dir = "cogs"
 ignoredmodules = []
 Whitelist = ['Admin', 'Mods'] # In case there is no config.ini, Admins and Mods will have priviledge by default
@@ -38,8 +35,8 @@ def loadConfig ():
     Whitelist = ast.literal_eval(config_object["LISTS"]["whitelist_rolename"]) #Since everything is a string
     global ignoredmodules
     ignoredmodules = ast.literal_eval(config_object["LISTS"]["ignoredmodules"]) #Every list has to be re-interpreted
-    global token
-    token = config_object["VALUES"]["token"]
+    #global token
+    #token = config_object["VALUES"]["token"]
     return
 
 def saveConfig ():
@@ -148,7 +145,6 @@ async def status_task():
 
 if __name__ == "__main__":
     loadConfig()
-
     extensionss = []
     for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
         extensionss.append(extension)
