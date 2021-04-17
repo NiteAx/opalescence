@@ -1,8 +1,10 @@
-import discord 
+import discord
 from discord.ext import commands
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from pathlib import Path
+import sys
+sys.path.append('..')
 from config import *
 
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']

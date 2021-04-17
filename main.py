@@ -9,12 +9,11 @@ from os import listdir
 from os.path import isfile, join
 import sys
 import ast
-sys.path.append('..')
-from config import token
 
 cogs_dir = "cogs"
 ignoredmodules = []
 Whitelist = ['Admin', 'Mods'] # In case there is no config.ini, Admins and Mods will have priviledge by default
+token = None
 
 intents = discord.Intents.default()
 intents.members=True
@@ -32,12 +31,12 @@ def loadConfig ():
     config_object.read("config.ini")
 
     #Load config
-    global Whitelist 
+    global Whitelist
     Whitelist = ast.literal_eval(config_object["LISTS"]["whitelist_rolename"]) #Since everything is a string
     global ignoredmodules
     ignoredmodules = ast.literal_eval(config_object["LISTS"]["ignoredmodules"]) #Every list has to be re-interpreted
-    #global token
-    #token = config_object["VALUES"]["token"]
+    global token
+    token = config_object["VALUES"]["token"]
     return
 
 def saveConfig ():
