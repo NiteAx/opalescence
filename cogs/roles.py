@@ -29,17 +29,7 @@ def rolesParser (msg, r):
         if r.name in line or str(r.id) in line: # To work with both unicode and custom
             return int(line.split("&")[1].split(">")[0]) # Return the role's id
 
-def saveChannels ():
-    with open("roles_ch.txt", "w") as f:
-        for c in ROLES_CH:
-            f.write(str(c) +"\n")
-    return
-
-def saveMessages ():
-    with open("roles_ms.txt", "w") as f:
-        for m in ROLES_MS:
-            f.write(str(m) +"\n")
-    return
+# TO-DO: Reload config if file changes
 
 def loadConfig ():
     #Read config.ini file
@@ -174,8 +164,7 @@ class roles(commands.Cog):
             id = int(chn.split("#")[1].split(">")[0])
             if id not in ROLES_CH:
                 ROLES_CH.append(id)
-                print(ROLES_CH)
-                saveChannels()
+                saveConfig()
                 await ctx.send("Added ["+chn+"] to the list of channels.")
         await ctx.send("The list right now is:")
         await ctx.send(ROLES_CH)
@@ -189,8 +178,7 @@ class roles(commands.Cog):
         else:
             if msg not in ROLES_MS:
                 ROLES_MS.append(msg)
-                print(ROLES_MS)
-                saveMessages()
+                saveConfig()
                 await ctx.send("Added ["+str(msg)+"] to the list of messages.")
         await ctx.send("The list right now is:")
         await ctx.send(ROLES_MS)
@@ -205,7 +193,7 @@ class roles(commands.Cog):
             id = int(chn.split("#")[1].split(">")[0])
             if id in ROLES_CH:
                 ROLES_CH.remove(id)
-                saveChannels()
+                saveConfig()
                 await ctx.send("Removed ["+chn+"] from the list of messages.")
         await ctx.send("The list right now is:")
         await ctx.send(ROLES_CH)
@@ -219,7 +207,7 @@ class roles(commands.Cog):
         else:
             if msg in ROLES_MS:
                 ROLES_MS.remove(msg)
-                saveMessages()
+                saveConfig()
                 await ctx.send("Removed ["+str(msg)+"] from the list of messages.")
         await ctx.send("The list right now is:")
         await ctx.send(ROLES_MS)
@@ -251,6 +239,11 @@ class roles(commands.Cog):
                 await ctx.send("Removed ["+rname+"] from the list of pingable roles.")
         await ctx.send("The list right now is:")
         await ctx.send(pingwhitelist)
+
+    #@commands.command()
+    #async def printdebug(self, ctx):
+    #    await ctx.send("Whitelist is:")
+    #    await ctx.send(Whitelist)
 
     #endregion
 
