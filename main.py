@@ -9,11 +9,12 @@ from os import listdir
 from os.path import isfile, join
 import sys
 import ast
+sys.path.append('..')
+from config import token
 
 cogs_dir = "cogs"
 ignoredmodules = []
 Whitelist = ['Admin', 'Mods'] # In case there is no config.ini, Admins and Mods will have priviledge by default
-token = None
 
 intents = discord.Intents.default()
 intents.members=True
