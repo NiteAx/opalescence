@@ -1,20 +1,28 @@
 import discord
+from discord.ext import commands
+from discord.ext.commands import MissingAnyRole
+
+from datetime import datetime
+from configparser import ConfigParser
+import ast
+import asyncio
 import traceback
 import sys
-from discord.ext import commands
-import sys
-sys.path.append('..')
-from config import Whitelist
 
 ROLES_CH = []
 ROLES_MS = []
+Whitelist = [] 
+pingwhitelist = []
+newprole = None
+pingtime = 60
+
+#region FUNCTIONS
 
 # Parse a valid reaction roles message and return the name of the role that matches r
 # A valid reaction roles message is expected to contain one or more individual lines that look like:
 # :emoji: <@&ID> Brief description
 # :emoji2: <@&ID2> Brief description 
 # :emoji3: <@&ID3> Brief description
-
 def rolesParser (msg, r):
     sp1 = msg.split("\n")
     for line in sp1:
@@ -33,30 +41,55 @@ def saveMessages ():
             f.write(str(m) +"\n")
     return
 
+def loadConfig ():
+    #Read config.ini file
+    config_object = ConfigParser()
+    config_object.read("config.ini")
+
+    #Load config
+    global ROLES_CH 
+    ROLES_CH = ast.literal_eval(config_object["LISTS"]["ROLES_CH"]) #Since everything is a string
+    global ROLES_MS 
+    ROLES_MS= ast.literal_eval(config_object["LISTS"]["ROLES_MS"]) #Every list has to be re-interpreted
+    global Whitelist 
+    Whitelist = ast.literal_eval(config_object["LISTS"]["whitelist_rolename"])
+    global pingwhitelist
+    pingwhitelist = ast.literal_eval(config_object["LISTS"]["pingwhitelist"])
+    global newprole
+    newprole = int(config_object["VALUES"]["newprole"])
+    return
+
+def saveConfig ():
+    #Read config.ini file
+    config_object = ConfigParser()
+    config_object.read("config.ini")
+
+    #Update the values this cog is allowed to edit.
+    lists = config_object["LISTS"]
+    lists["ROLES_CH"] = str(ROLES_CH) # Everything saved to config.ini must be a string
+    lists["ROLES_MS"] = str(ROLES_MS)
+    lists["pingwhitelist"] = str(pingwhitelist)
+
+    #Write changes back to file
+    with open('config.ini', 'w') as conf:
+        config_object.write(conf)
+    return
+#endregion
+
 class roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
-        try:
-            with open("roles_ms.txt", "r") as f:
-                for line in f:
-                    ROLES_MS.append(int(line.strip()))
-        except:
-            print("File roles_ms.txt doesn't exist yet")
-        try:
-            with open("roles_ch.txt", "r") as f:
-                for line in f:
-                    ROLES_CH.append(int(line.strip()))
-        except:
-            print("File roles_ch.txt doesn't exist yet")
+        loadConfig()
 
+    #region on_reaction events
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if payload.channel_id in ROLES_CH: # If correct channel
             if payload.message_id in ROLES_MS: # If valid message
                 msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
                 role_id = rolesParser(msg.content, payload.emoji)
-                if role_id:
+                if role.name_id:
                     guild = self.bot.get_guild(payload.guild_id)
                     role = guild.get_role(role_id) # Returns None for some reason?
                     await guild.get_member(payload.user_id).add_roles(role)
@@ -68,46 +101,139 @@ class roles(commands.Cog):
             if payload.message_id in ROLES_MS:
                 msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
                 role_id = rolesParser(msg.content, payload.emoji)
-                if role_id:
+                if role.name_id:
                     guild = self.bot.get_guild(payload.guild_id)
                     role = guild.get_role(role_id)
                     await guild.get_member(payload.user_id).remove_roles(role)
                 return
+    #endregion
 
+    # We can no longer use "@commands.has_any_role(*Whitelist)" because the paremeter to has_any_role
+    # Is given when the cog is loaded, which means it's empty, and it never updates.
+    # The check of having a valid roles is now done inside the
+    @commands.command(pass_context=True)
+    async def roleid(self, ctx, *, rolename : str):
+        """Returns the ID of a given role"""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            roles = ctx.message.guild.roles
+            for role in (y for y in roles if y.name.lower() == rolename.lower()):
+                print(role.name+': '+str(role.id))
+                await ctx.send('```'+role.name+': '+str(role.id)+'```')
+
+    @commands.command(pass_context=True)
+    async def listroles(self, ctx):
+        """Return all the roles in the server and their id"""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            roles = ctx.message.guild.roles
+            for role in (y for y in roles if y.name != '@everyone'):
+                print(role.name +' '+ str(role.id))
+
+    @commands.command(pass_context=True)
+    @commands.cooldown(rate=1, per=pingtime, type=commands.BucketType.user)
+    async def ping(self, ctx, *, role : str):
+        """Make a whitelist role pingable for 60 seconds. Cooldown default is 5 minutes."""
+        if ctx.message.author.top_role.name == 'Mods':
+                    ctx.command.reset_cooldown(ctx)
+        if ctx.message.author.top_role.id != newprole: #ignore newp
+            if any(pingrole.lower() == role.lower() for pingrole in pingwhitelist):
+                print('['+(str(datetime.now())).split('.')[0]+' UTC] '+ctx.message.author.name+' used ?ping '+role)
+                roles = ctx.message.guild.roles
+                roles = [r.name for r in roles]
+                for r in (y for y in roles if y.lower() == role.lower()):
+                    pingrole = r
+                r = pingrole
+                pingrole = discord.utils.get(ctx.message.guild.roles, name=r)
+                await pingrole.edit(mentionable=True)
+                nowpingable = await ctx.send('```'+r+' is now pingable for '+str(pingtime)+' seconds.```')
+                await asyncio.sleep(pingtime)
+                await pingrole.edit(mentionable=False)
+                #await ctx.message.delete()
+                #await nowpingable.delete()
+            else:
+                print(ctx.message.author.name+' failed to use ?ping '+role+' at '+str(datetime.now()))
+                notwhitelisted = await ctx.send('```'+role+' is not whitelisted.```')
+                ctx.command.reset_cooldown(ctx)
+                await asyncio.sleep(5)
+                #await ctx.message.delete()
+                #await notwhitelisted.delete()
+
+    #region functions to edit configuration
     @commands.command()
-    @commands.has_any_role(*Whitelist)
     async def addreactionchannel(self, ctx, chn : str):
-        id = int(chn.split("#")[1].split(">")[0])
-        if id not in ROLES_CH:
-            ROLES_CH.append(id)
-            print(ROLES_CH)
-            saveChannels()
-
+        """Add a channel to the whitelist of the role_on_reaction event."""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            id = int(chn.split("#")[1].split(">")[0])
+            if id not in ROLES_CH:
+                ROLES_CH.append(id)
+                print(ROLES_CH)
+                saveChannels()
 
     @commands.command()
-    @commands.has_any_role(*Whitelist)
     async def addreactionmessage(self, ctx, msg : int):
-        if msg not in ROLES_MS:
-            ROLES_MS.append(msg)
-            print(ROLES_MS)
-            saveMessages()
+        """Add a message to the whitelist of the role_on_reaction event."""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            if msg not in ROLES_MS:
+                ROLES_MS.append(msg)
+                print(ROLES_MS)
+                saveMessages()
 
     @commands.command()
-    @commands.has_any_role(*Whitelist)
     async def removereactionchannel(self, ctx, chn : str):
-        id = int(chn.split("#")[1].split(">")[0])
-        if id in ROLES_CH:
-            ROLES_CH.remove(id)
-            saveChannels()
-
+        """Remove a channel from the whitelist of the role_on_reaction event."""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            id = int(chn.split("#")[1].split(">")[0])
+            if id in ROLES_CH:
+                ROLES_CH.remove(id)
+                saveChannels()
 
     @commands.command()
-    @commands.has_any_role(*Whitelist)
     async def removereactionmessage(self, ctx, msg : int):
-        if msg in ROLES_MS:
-            ROLES_MS.remove(msg)
-            saveMessages()
+        """Remove a message from the whitelist of the role_on_reaction event."""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            if msg in ROLES_MS:
+                ROLES_MS.remove(msg)
+                saveMessages()
 
+    @commands.command()
+    async def addpingrole(self, ctx, *, rname : str ):
+        """Add a role to the whitelist of pingable roles."""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            if rname not in pingwhitelist:
+                pingwhitelist.append(rname)
+                saveConfig()
+
+    @commands.command()
+    async def removepingrole(self, ctx, *, rname : str):
+        """Remove a role from the whitelist of pingable roles."""
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            if rname in pingwhitelist:
+                pingwhitelist.remove(rname)
+                saveConfig()
+    #endregion
 
 
 def setup(bot):
