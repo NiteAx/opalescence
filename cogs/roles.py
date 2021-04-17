@@ -89,9 +89,9 @@ class roles(commands.Cog):
             if payload.message_id in ROLES_MS: # If valid message
                 msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
                 role_id = rolesParser(msg.content, payload.emoji)
-                if role.name_id:
-                    guild = self.bot.get_guild(payload.guild_id)
-                    role = guild.get_role(role_id) # Returns None for some reason?
+                guild = self.bot.get_guild(payload.guild_id)
+                role = guild.get_role(role_id) 
+                if role:
                     await guild.get_member(payload.user_id).add_roles(role)
                 return
 
@@ -101,9 +101,9 @@ class roles(commands.Cog):
             if payload.message_id in ROLES_MS:
                 msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
                 role_id = rolesParser(msg.content, payload.emoji)
-                if role.name_id:
-                    guild = self.bot.get_guild(payload.guild_id)
-                    role = guild.get_role(role_id)
+                guild = self.bot.get_guild(payload.guild_id)
+                role = guild.get_role(role_id)
+                if role:
                     await guild.get_member(payload.user_id).remove_roles(role)
                 return
     #endregion
@@ -176,6 +176,9 @@ class roles(commands.Cog):
                 ROLES_CH.append(id)
                 print(ROLES_CH)
                 saveChannels()
+                await ctx.send("Added ["+chn+"] to the list of channels.")
+        await ctx.send("The list right now is:")
+        await ctx.send(ROLES_CH)
 
     @commands.command()
     async def addreactionmessage(self, ctx, msg : int):
@@ -188,6 +191,9 @@ class roles(commands.Cog):
                 ROLES_MS.append(msg)
                 print(ROLES_MS)
                 saveMessages()
+                await ctx.send("Added ["+str(msg)+"] to the list of messages.")
+        await ctx.send("The list right now is:")
+        await ctx.send(ROLES_MS)
 
     @commands.command()
     async def removereactionchannel(self, ctx, chn : str):
@@ -200,6 +206,9 @@ class roles(commands.Cog):
             if id in ROLES_CH:
                 ROLES_CH.remove(id)
                 saveChannels()
+                await ctx.send("Removed ["+chn+"] from the list of messages.")
+        await ctx.send("The list right now is:")
+        await ctx.send(ROLES_CH)
 
     @commands.command()
     async def removereactionmessage(self, ctx, msg : int):
@@ -211,6 +220,9 @@ class roles(commands.Cog):
             if msg in ROLES_MS:
                 ROLES_MS.remove(msg)
                 saveMessages()
+                await ctx.send("Removed ["+str(msg)+"] from the list of messages.")
+        await ctx.send("The list right now is:")
+        await ctx.send(ROLES_MS)
 
     @commands.command()
     async def addpingrole(self, ctx, *, rname : str ):
@@ -222,6 +234,9 @@ class roles(commands.Cog):
             if rname not in pingwhitelist:
                 pingwhitelist.append(rname)
                 saveConfig()
+                await ctx.send("Added ["+rname+"] to the list of pingable roles.")
+        await ctx.send("The list right now is:")
+        await ctx.send(pingwhitelist)
 
     @commands.command()
     async def removepingrole(self, ctx, *, rname : str):
@@ -233,6 +248,10 @@ class roles(commands.Cog):
             if rname in pingwhitelist:
                 pingwhitelist.remove(rname)
                 saveConfig()
+                await ctx.send("Removed ["+rname+"] from the list of pingable roles.")
+        await ctx.send("The list right now is:")
+        await ctx.send(pingwhitelist)
+
     #endregion
 
 
