@@ -38,7 +38,7 @@ def loadConfig ():
     global ignoredmodules
     ignoredmodules = ast.literal_eval(config_object["LISTS"]["ignoredmodules"]) #Every list has to be re-interpreted
     global token
-    token = config_object["VALUES"]["othertoken"]
+    token = config_object["VALUES"]["token"]
     return
 
 def saveConfig ():
