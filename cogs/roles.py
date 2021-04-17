@@ -29,8 +29,6 @@ def rolesParser (msg, r):
         if r.name in line or str(r.id) in line: # To work with both unicode and custom
             return int(line.split("&")[1].split(">")[0]) # Return the role's id
 
-# TO-DO: Reload config if file changes
-
 def loadConfig ():
     #Read config.ini file
     config_object = ConfigParser()
