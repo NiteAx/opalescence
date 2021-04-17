@@ -10,9 +10,12 @@ from os.path import isfile, join
 import sys
 import ast
 
+sys.path.append('..')
+from config import othertoken
+
 cogs_dir = "cogs"
 ignoredmodules = []
-Whitelist = ['Admin', 'Mods'] # In case there is no config,Admins and Mods will have priviledge by default
+Whitelist = ['Admin', 'Mods'] # In case there is no config.ini, Admins and Mods will have priviledge by default
 token = None
 
 intents = discord.Intents.default()
@@ -122,6 +125,7 @@ async def addmodrole(ctx, *, rname : str ):
         if rname not in Whitelist:
             Whitelist.append(rname)
             saveConfig()
+            ctx.send("Added ["+str+"] to the list of priviledged roles.")
 
 @bot.command()
 async def removemodrole(ctx, *, rname : str ):
@@ -133,6 +137,7 @@ async def removemodrole(ctx, *, rname : str ):
         if rname in Whitelist:
             Whitelist.remove(rname)
             saveConfig()
+            ctx.send("Removed ["+str+"] from the list of priviledged roles.")
 
 async def status_task():
     while True:
