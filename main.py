@@ -10,6 +10,8 @@ from os.path import isfile, join
 import sys
 import ast
 
+# Cogs affected by config.ini, and so need to be reload when Whitelist changes
+cogsList = ['cogs.roles']
 cogs_dir = "cogs"
 ignoredmodules = []
 Whitelist = ['Admin', 'Mods'] # In case there is no config.ini, Admins and Mods will have priviledge by default
@@ -22,7 +24,7 @@ intents.guild_messages=True
 intents.guild_reactions=True
 intents.members=True
 intents.presences=True
-bot = commands.Bot(command_prefix='?', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 #region Config functions.
 def loadConfig ():
@@ -80,7 +82,7 @@ async def load(ctx, extension_name : str):
 @bot.command()
 @commands.has_any_role(*Whitelist)
 async def unload(ctx, extension_name : str):
-    global Whitelist
+    global Whitelist 
     if not len([role for role in ctx.author.roles if role.name in Whitelist]):
         raise MissingAnyRole
     else:
@@ -113,6 +115,18 @@ async def reload(ctx, extension_name : str):
         await ctx.send("{} reloaded.".format(extension_name))
 
 @bot.command()
+async def reloadCogs(ctx):
+    global cogsList
+    for cogname in cogsList:
+        bot.unload_extension(cogname)
+        try:
+            bot.load_extension(cogname)
+        except (AttributeError, ImportError) as e:
+            await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+            return
+        await ctx.send("{} reloaded.".format(cogname))
+
+@bot.command()
 async def addmodrole(ctx, *, rname : str ):
     """Add a role to the whitelist of privileged roles."""
     global Whitelist
@@ -122,7 +136,8 @@ async def addmodrole(ctx, *, rname : str ):
         if rname not in Whitelist:
             Whitelist.append(rname)
             saveConfig()
-            ctx.send("Added ["+str+"] to the list of priviledged roles.")
+            await reloadCogs(ctx)
+            await ctx.send("Added ["+rname+"] to the list of priviledged roles.")
 
 @bot.command()
 async def removemodrole(ctx, *, rname : str ):
@@ -134,7 +149,8 @@ async def removemodrole(ctx, *, rname : str ):
         if rname in Whitelist:
             Whitelist.remove(rname)
             saveConfig()
-            ctx.send("Removed ["+str+"] from the list of priviledged roles.")
+            await reloadCogs(ctx)
+            await ctx.send("Removed ["+rname+"] from the list of priviledged roles.")
 
 async def status_task():
     while True:
@@ -145,6 +161,7 @@ async def status_task():
 
 if __name__ == "__main__":
     loadConfig()
+
     extensionss = []
     for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
         extensionss.append(extension)
