@@ -9,6 +9,8 @@ from os import listdir
 from os.path import isfile, join
 import sys
 import ast
+import datetime
+from datetime import datetime
 
 # Cogs affected by config.ini, and so need to be reload when Whitelist changes
 cogsList = ['cogs.roles']
@@ -62,6 +64,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    await bot.get_channel(141020464028844033).send("```Restarted at: "+(str(datetime.now())).split('.')[0]+' UTC '+"```")
     bot.loop.create_task(status_task())
 
 @bot.command()
@@ -82,7 +85,7 @@ async def load(ctx, extension_name : str):
 @bot.command()
 @commands.has_any_role(*Whitelist)
 async def unload(ctx, extension_name : str):
-    global Whitelist 
+    global Whitelist
     if not len([role for role in ctx.author.roles if role.name in Whitelist]):
         raise MissingAnyRole
     else:

@@ -76,8 +76,8 @@ class Tracker(commands.Cog):
                       deletetime = str(datetime.utcnow()).split('.')[0]+' UTC'
                       embed.set_footer(text=deletetime+' '+identifier)
                       await self.bot.get_channel(image_channel).send(embed=embed)
-                  else: #If we don't have an embed (message contains no image), post to test server logging channel
-                      await self.bot.get_channel(message_channel).send('['+(str(message.created_at)).split('.')[0]+' UTC] #'+message.channel.name+' '+message.author.name+' ('+str(message.author.id)+')'+' : '+message.content)
+                  #else: #If we don't have an embed (message contains no image), post to test server logging channel
+                      #await self.bot.get_channel(message_channel).send('['+(str(message.created_at)).split('.')[0]+' UTC] #'+message.channel.name+' '+message.author.name+' ('+str(message.author.id)+')'+' : '+message.content)
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
@@ -105,7 +105,7 @@ class Tracker(commands.Cog):
     async def on_member_remove(self, member):
         if member.guild.id == guild_id:
             message = member.name+' ('+str(member.id)+') left the server.'
-            await self.bot.get_channel(message_channel).send(message)
+            await self.bot.get_channel(141710126628339712).send(message)
 
 def setup(bot):
     bot.add_cog(Tracker(bot))
