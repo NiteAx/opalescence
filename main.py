@@ -24,7 +24,7 @@ intents.guild_messages=True
 intents.guild_reactions=True
 intents.members=True
 intents.presences=True
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='?', intents=intents)
 
 #region Config functions.
 def loadConfig ():
