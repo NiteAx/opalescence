@@ -72,7 +72,7 @@ class Banner(commands.Cog):
         else:
             await ctx.send(str("```Banner not currently set.```"))
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(minutes=60)
     async def set_random_banner(self):
         global current_banner
         guild = self.bot.get_guild(guild_id)
