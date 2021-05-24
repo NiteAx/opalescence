@@ -13,6 +13,7 @@ db  = TinyDB(dbdir)
 
 # Move to config.py?
 modrole = 175814520118312960
+ignoredchannels = [141710126628339712]
 
 def revfilter(msg): #First, a filter is constructed based on stuff
     #print('-------------------------------------------------------\nMessage: '+msg)
@@ -63,11 +64,12 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
           else:
               if message.guild.id == guild_id: #Only listen to Manechat
                 if message.author.top_role.id != modrole: #Ignore mods
-                  if revfilter(message.content) == True:
-                    #print(message.author.top_role.id)
-                    #print('Deleting pleb')
-                    await message.delete()
-                    await self.bot.get_channel(image_channel).send('```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
+                  if message.channel.id not in ignoredchannels:
+                    if revfilter(message.content) == True:
+                      #print(message.author.top_role.id)
+                      #print('Deleting pleb')
+                      await message.delete()
+                      await self.bot.get_channel(image_channel).send('```Removed message from '+message.author.name+'#'+message.author.discriminator+' in #'+message.channel.name+':\n '+message.content+'```') #Report deletion to log channel
                   
     @commands.Cog.listener()
     async def on_message_edit(self, before, after): #Listen to message edits
@@ -76,11 +78,12 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
               print(after.author.name+": "+before.content+" --> "+after.content)
           else:
             if after.guild.id == guild_id: #Only listen to Manechat
-              if revfilter(after.content) == True:
-                #print(after.author.top_role.id)
-                #print('Deleting pleb')
-                await after.delete()
-                await self.bot.get_channel(image_channel).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
+              if after.channel.id not in ignoredchannels:
+                if revfilter(after.content) == True:
+                  #print(after.author.top_role.id)
+                  #print('Deleting pleb')
+                  await after.delete()
+                  await self.bot.get_channel(image_channel).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
               
     # No createWhitelist because we can't create a whitelist without category and value
     
