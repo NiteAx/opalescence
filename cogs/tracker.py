@@ -16,6 +16,7 @@ from datetime import datetime
 embedflag = 0
 ignoredchannels = [526339834432716815] #sweetielog
 commonformat = ['.png','.jpeg','.jpg','.gif']
+User_join = False
 
 class Tracker(commands.Cog):
     def __init__(self, bot):
@@ -100,6 +101,18 @@ class Tracker(commands.Cog):
             message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji
             print(message)
             await self.bot.get_channel(reaction_channel).send(message)
+
+    @bot.command()
+    @commands.has_any_role(*Whitelist)
+    async def userjoin(ctx):
+        global User_join
+        User_join = not User_join
+        print(User_join)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        if User_join:
+            await self.client.get_channel(141020464028844033).send(f"{member.mention} has joined the server. (Created {member.created_at})")
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
