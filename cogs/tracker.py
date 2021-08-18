@@ -2,10 +2,12 @@
 #Keeps track of reactions added and removed from messages posted since bot's last startup
 
 from discord.ext import commands
+from discord.ext.commands import MissingAnyRole
 import discord
 import sys
 sys.path.append('..')
-from config import *
+from configparser import ConfigParser
+import ast
 import asyncio
 import random
 import time
@@ -16,10 +18,34 @@ from datetime import datetime
 embedflag = 0
 ignoredchannels = [526339834432716815] #sweetielog
 commonformat = ['.png','.jpeg','.jpg','.gif']
+reaction_channel = None
+guild_id = None
+image_channel = None
+User_join = False
+Track_reaction = False
+Whitelist = []
+
+def loadConfig ():
+    #Read config.ini file
+    config_object = ConfigParser()
+    config_object.read("config.ini")
+
+    #Load config
+    global Whitelist 
+    Whitelist = ast.literal_eval(config_object["LISTS"]["whitelist_rolename"])
+    global reaction_channel
+    reaction_channel = int(config_object["VALUES"]["reaction_channel"])
+    global image_channel
+    image_channel = int(config_object["VALUES"]["image_channel"])
+    global guild_id
+    guild_id = int(config_object["VALUES"]["guild_id"])
+    return
+
 
 class Tracker(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        loadConfig()
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -81,25 +107,50 @@ class Tracker(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        if reaction.custom_emoji == True:
-            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji.name
-            print(message)
-            await self.bot.get_channel(reaction_channel).send(message)
-        else:
-            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji
-            print(message)
-            await self.bot.get_channel(reaction_channel).send(message)
+        if Track_reaction:
+            if reaction.custom_emoji == True:
+                message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji.name
+                print(message)
+                await self.bot.get_channel(reaction_channel).send(message)
+            else:
+                message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" reacted : "+reaction.emoji
+                print(message)
+                await self.bot.get_channel(reaction_channel).send(message)
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
-        if reaction.custom_emoji == True:
-            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji.name
-            print(message)
-            await self.bot.get_channel(reaction_channel).send(message)
+        if Track_reaction:
+            if reaction.custom_emoji == True:
+                message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji.name
+                print(message)
+                await self.bot.get_channel(reaction_channel).send(message)
+            else:
+                message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji
+                print(message)
+                await self.bot.get_channel(reaction_channel).send(message)
+
+    @commands.command(pass_context=True)
+    async def trackjoins(self, ctx):
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
         else:
-            message = '['+(str(datetime.now())).split('.')[0]+' UTC] '+user.name+" removed reaction : "+reaction.emoji
-            print(message)
-            await self.bot.get_channel(reaction_channel).send(message)
+            global User_join
+            User_join = not User_join
+
+    @commands.command(pass_context=True)
+    async def trackreactionss(self, ctx):
+        global Whitelist
+        if not len([role for role in ctx.author.roles if role.name in Whitelist]):
+            raise MissingAnyRole
+        else:
+            global Track_reaction
+            Track_reaction = not Track_reaction
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        if User_join:
+            await self.bot.get_channel(141020464028844033).send(f"{member.mention} has joined the server. (Created {member.created_at})")
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):

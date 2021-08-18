@@ -58,19 +58,6 @@ class Basic(commands.Cog):
         await asyncio.sleep(time)
         await ctx.send(reminder)
 
-    @commands.command(pass_context=True)
-    async def joinrole(self, ctx):
-        chosenrole = ctx.message.guild.get_role(random.choice(roles))
-        print('Random Role: '+chosenrole.name+' '+str(chosenrole.id))
-        user = ctx.message.author
-        memberoles = []
-        for role in user.roles:
-            memberoles.append(role.id)
-        #print("Member Role ID's:")
-        #print(memberoles)
-        if set(roles).isdisjoint(set(memberoles)):
-            await user.add_roles(chosenrole)
-
     @commands.command()
     @commands.has_any_role(*Whitelist)
     async def stowaways(self, ctx):
