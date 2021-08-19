@@ -12,10 +12,11 @@ import random
 
 Event_roles = []
 Whitelist = []
+
+# FLAGS #
 Rarity = False
 RD = False
-
-#region FUNCTIONS
+Anniversary = False
 
 def loadConfig ():
     #Read config.ini file
@@ -26,7 +27,7 @@ def loadConfig ():
     global Whitelist 
     Whitelist = ast.literal_eval(config_object["LISTS"]["whitelist_rolename"])
     return
-#endregion
+
 
 class events(commands.Cog):
     def __init__(self, bot):
@@ -46,6 +47,16 @@ class events(commands.Cog):
             if "rarity" in event:
                 global Rarity
                 Rarity = True
+            #if "anniversary" in event:
+                # TO-DO
+                # Role names generated from year
+                # Gradient from 0 to 13, make roles display separately
+                # [f1c40f, e67e22, e74c3c, e91e63, ce42c9, b03cdf, 753bd6, 206694, 3498db, 1abc9c, 2ecc71, 1f8b4c, 84cc2e]
+                # Do not add the roles to Event_roles
+                # Turn off colours for Princess Core, Bots Core and Nitro Boost fans, turn off their displays separetely.
+                # Turn off Member role display separately too, I think
+
+
 
     @commands.command(pass_context=True)
     async def endevent(self, ctx):
@@ -55,12 +66,17 @@ class events(commands.Cog):
         else:
             global RD
             global Rarity
-            RD = Rarity = False
+            global Anniversary
+            #if Anniversary:
+                # Undo role changes
+            
+            Anniversary = RD = Rarity = False
             
             global Event_roles
             for r in Event_roles:
                 role = discord.utils.get(ctx.guild.roles, id=r)
                 await role.delete()
+                await asyncio.sleep(1)
             Event_roles = []
 
     @commands.command(pass_context=True)

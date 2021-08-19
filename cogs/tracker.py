@@ -139,7 +139,7 @@ class Tracker(commands.Cog):
             User_join = not User_join
 
     @commands.command(pass_context=True)
-    async def trackreactionss(self, ctx):
+    async def trackreactions(self, ctx):
         global Whitelist
         if not len([role for role in ctx.author.roles if role.name in Whitelist]):
             raise MissingAnyRole
