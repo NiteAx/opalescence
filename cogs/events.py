@@ -44,9 +44,11 @@ class events(commands.Cog):
             if "rd" in event or "rainbow dash" in event:
                 global RD
                 RD = True
+                await ctx.send("Rainbow Dash event is now enabled.")
             if "rarity" in event:
                 global Rarity
                 Rarity = True
+                await ctx.send("Rarity event is now enabled.")
             #if "anniversary" in event:
                 # TO-DO
                 # Role names generated from year
@@ -73,6 +75,7 @@ class events(commands.Cog):
             Anniversary = RD = Rarity = False
             
             global Event_roles
+            await ctx.send("Deleting all "+str(len(Event_roles))+" event roles.")
             for r in Event_roles:
                 role = discord.utils.get(ctx.guild.roles, id=r)
                 await role.delete()
@@ -100,6 +103,7 @@ class events(commands.Cog):
                 chosenrole = ctx.message.guild.get_role(random.choice(Event_roles))
                 print('Random Role: '+chosenrole.name+' '+str(chosenrole.id))
                 await user.add_roles(chosenrole)
+                await ctx.send("Congrats! You've joined Team "+str(chosenrole.name))
         if Rarity:
             user = ctx.message.author
             memberoles = []
@@ -122,6 +126,9 @@ class events(commands.Cog):
                 Event_roles.append(role.id)
                 user = ctx.message.author
                 await user.add_roles(role)
+                await ctx.send("Here's your <@&"+str(role.id)+">, darling! Made just for you! <:raritydarling:586297222031867941>")
+            else:
+                await ctx.send("You already have my best accouterment. <:rarityheadache:681838872686362624>")
 
 
 
