@@ -27,7 +27,7 @@ class Basic(commands.Cog):
     @commands.has_any_role(*Whitelist)
     async def add(self, ctx, left : int, right : int):
         """Adds two numbers together."""
-        await ctx.send("The sum of "+str(left)+" and "+str(right)+" is "+str(left+right)+"!")
+        await ctx.send("The sum of "+str(left)+" and "+str(right)+" is "+str(left+right)+"!!!!!")
 
     #bad channel parsing
     @commands.command()
