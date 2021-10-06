@@ -25,7 +25,7 @@ jobs:
         with:
           username: niteax
           server: hithroc.org
-          port: 22 # default is 22
+          port: 12350 # default is 22
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
           
