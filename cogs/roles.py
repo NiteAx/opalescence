@@ -25,9 +25,11 @@ pingtime = 60
 # :emoji3: <@&ID3> Brief description
 def rolesParser (msg, r):
     sp1 = msg.split("\n")
+    ids = []
     for line in sp1:
         if r.name in line or str(r.id) in line: # To work with both unicode and custom
-            return int(line.split("&")[1].split(">")[0]) # Return the role's id
+            ids.append(int(line.split("&")[1].split(">")[0])) # Append the role's id
+    return ids # Return the list so that the module works with multiple roles per emoji
 
 def loadConfig ():
     #Read config.ini file
@@ -76,11 +78,16 @@ class roles(commands.Cog):
         if payload.channel_id in ROLES_CH: # If correct channel
             if payload.message_id in ROLES_MS: # If valid message
                 msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-                role_id = rolesParser(msg.content, payload.emoji)
+                role_ids = rolesParser(msg.content, payload.emoji)
                 guild = self.bot.get_guild(payload.guild_id)
-                role = guild.get_role(role_id) 
-                if role:
-                    await guild.get_member(payload.user_id).add_roles(role)
+                user = guild.get_member(payload.user_id)
+                for id in role_ids:
+                    role = guild.get_role(id)
+                    if (role not in user.roles):
+                        await user.add_roles(role)
+                        continue
+                    else: # Remove if they already have it
+                        await user.remove_roles(role)
                 return
 
     @commands.Cog.listener()
@@ -88,11 +95,11 @@ class roles(commands.Cog):
         if payload.channel_id in ROLES_CH:
             if payload.message_id in ROLES_MS:
                 msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-                role_id = rolesParser(msg.content, payload.emoji)
+                role_ids = rolesParser(msg.content, payload.emoji)
                 guild = self.bot.get_guild(payload.guild_id)
-                role = guild.get_role(role_id)
-                if role:
-                    await guild.get_member(payload.user_id).remove_roles(role)
+                user = guild.get_member(payload.user_id)
+                for role in role_ids:
+                    await user.remove_roles(guild.get_role(role))
                 return
     #endregion
 
