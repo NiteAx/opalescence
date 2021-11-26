@@ -32,7 +32,7 @@ jobs:
           # will put all file under this path
           local_path: ./* # default is ./*
           # files will copy to under remote_path
-          remote_path: /home/niteax/opalescence
+          remote_path: /home/ubuntu/opalescence
           
           # sftp args
           args: '-o ConnectTimeout=5'
