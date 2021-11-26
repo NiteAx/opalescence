@@ -11,10 +11,10 @@ For the most part, it is largely just a way for me to learn how to do things in 
 * All useful functionality of the bot is available as individual scripts inside the cogs directory. 
 
 ### Requirements
-    discord.py 1.4.1
-    gspread
-    oauth2client
-    tinydb
+    py-cord==1.7.3
+    gspread==4.0.1
+    oauth2client==4.1.3
+    tinydb==4.5.2
 
 ### If you are reading this
 
