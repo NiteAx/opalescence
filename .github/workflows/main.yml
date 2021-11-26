@@ -23,9 +23,9 @@ jobs:
       - name: SFTP Deploy
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
         with:
-          username: niteax
-          server: hithroc.org
-          port: 12350 # default is 22
+          username: ubuntu
+          server: 193.70.90.133
+          port: 22 # default is 22
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
           
