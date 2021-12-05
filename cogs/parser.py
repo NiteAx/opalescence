@@ -63,7 +63,7 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
               print(message.author.name+": "+message.content)
           else:
               if message.guild.id == guild_id: #Only listen to Manechat
-                if message.author.top_role.id != modrole: #Ignore mods
+                if not len([role for role in message.author.roles if role.name in Whitelist]): # Check the author is not a mod.
                   if message.channel.id not in ignoredchannels:
                     if revfilter(message.content) == True:
                       #print(message.author.top_role.id)
