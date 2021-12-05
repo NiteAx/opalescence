@@ -78,12 +78,13 @@ class Parser(commands.Cog): #Finally, parser checks message against revfilter() 
               print(after.author.name+": "+before.content+" --> "+after.content)
           else:
             if after.guild.id == guild_id: #Only listen to Manechat
-              if after.channel.id not in ignoredchannels:
-                if revfilter(after.content) == True:
-                  #print(after.author.top_role.id)
-                  #print('Deleting pleb')
-                  await after.delete()
-                  await self.bot.get_channel(image_channel).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
+              if after.author.top_role.id != modrole: #Ignore mods
+                if after.channel.id not in ignoredchannels:
+                  if revfilter(after.content) == True:
+                    #print(after.author.top_role.id)
+                    #print('Deleting pleb')
+                    await after.delete()
+                    await self.bot.get_channel(image_channel).send('```Removed edited message from '+after.author.name+'#'+after.author.discriminator+' in #'+after.channel.name+':\n '+after.content+'```') #Report deletion to log channel
               
     # No createWhitelist because we can't create a whitelist without category and value
     
